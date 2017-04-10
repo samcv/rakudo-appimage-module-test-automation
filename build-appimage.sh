@@ -6,11 +6,19 @@ ORIG_DIR="$(pwd)"
 echo $ORIG_DIR
 sudo mkdir -p -v /rsu
 sudo chown $(whoami):$(whoami) /rsu || exit
-#cd /rsu
 TAR_GZ=rakudo-star-latest.tar.gz
-wget http://rakudo.org/downloads/star/$TAR_GZ
+check_tar () { gzip -tv $TAR_GZ; }
+# IF we already have the download, check its integrity, otherwise delete
+if [ -f $TAR_GZ ]; then
+    check_tar || rm -fv $TAR_GZ
+fi
+if [ ! -f $TAR_GZ ]; then
+    wget http://rakudo.org/downloads/star/$TAR_GZ
+fi
+printf "Checking the compressed file integrity.\n"
+gzip -tv $TAR_GZ
 tar -xf $TAR_GZ || exit
-cd $TAR_GZ || exit
+cd "$(find . -name 'rakudo-star*' -type d)" || exit
 perl ./Configure.pl --prefix="/rsu" --backends=moar --gen-moar || exit
 make || exit
 make install || exit
@@ -43,6 +51,6 @@ RETURN_CODE=$?
 mv "$(find . -name '*.AppImage')" "$ORIG_DIR"
 cd "$ORIG_DIR"
 if [ $RETURN_CODE == 0 ]; then
-    rm -rfv /rsu
+    sudo rm -rfv /rsu
 fi
 return $RETURN_CODE
