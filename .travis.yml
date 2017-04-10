@@ -13,28 +13,19 @@ dist: trusty
 
 addons:
   apt:
-    sources:
-    # add PPAs with more up-to-date toolchains
-    #- ubuntu-toolchain-r-test
     packages:
         - libappstream0
         - libappstream-dev
         - gir1.2-appstream
         - appstream-index
-    # install toolchains
-    #- gcc-6
-#    - openjdk-7-jdk
 
 script:
     - chmod +x build-appimage.sh
     - ./build-appimage.sh
-#    - perl Configure.pl $RAKUDO_OPTIONS --moar-option=--cc=$(command -v gcc-6 >/dev/null 2>&1; if [ $? -eq 1 ]; then printf "gcc"; else printf "gcc-6"; fi)
-    #- #"make test"
-#    - "make install"
+    - eval "APPIMAGE_DEBUG=1 $(find . -name '*.AppImage') -e 'use Terminal::ANSIColor; say colored(‘what a lovely colours!’, ‘underline red on_green’);" || pwd; ls -lh
 
 branches:
    only:
-     #- nom
      - /.*/
 
 notifications:
