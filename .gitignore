@@ -1,0 +1,4 @@
+rakudo*/
+*.AppDir
+rakudo-star*.tar.gz
+*.AppImage
