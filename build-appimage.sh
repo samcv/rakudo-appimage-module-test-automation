@@ -46,10 +46,11 @@ cp -v "$ORIG_DIR/$APP.png" "./$APP.AppDir"
 #stage_1
 #stage_2
 # Download the appimage tool which actually makes the Appimages
-wget "https://github.com/probonopd/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+wget --tries=5 "https://github.com/probonopd/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
 chmod -v a+x appimagetool-x86_64.AppImage
-curl https://github.com/probonopd/AppImageKit/releases/download/continuous/AppRun-x86_64 -o "$APP.AppDir/AppRun"
-chmod -v a+x "$APP.AppDir/AppRun"
+wget --tries=5 "https://github.com/probonopd/AppImageKit/releases/download/continuous/AppRun-x86_64"
+chmod -v a+x AppRun-x86_64
+mv -v  AppRun-x86_64 "$APP.AppDir/AppRun"
 # AppImage tools are dumb and refuse to create the appimage, if this happens,
 # and it will, try again with -n option to force it
 ./appimagetool-x86_64.AppImage -v "$APP.AppDir" || ./appimagetool-x86_64.AppImage -v -n "$APP.AppDir"
