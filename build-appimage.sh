@@ -3,9 +3,10 @@ APP=perl6
 ID=org.perl6.rakudo
 
 ORIG_DIR="$(pwd)"
-echo $ORIG_DIR
-sudo mkdir -p -v /rsu
-sudo chown $(whoami):$(whoami) /rsu || exit
+echo "ORIG_DIR=$ORIG_DIR APP=$APP ID=$ID"
+#stage_1 () {
+sudo mkdir -v /rsu || sudo rm -rfv /rsu && sudo mkdir -v /rsu
+sudo chown -R $(whoami):$(whoami) /rsu || exit
 TAR_GZ=rakudo-star-latest.tar.gz
 check_tar () { gzip -tv $TAR_GZ; }
 # IF we already have the download, check its integrity, otherwise delete
@@ -41,16 +42,25 @@ cp -v "$ORIG_DIR/$ID.appdata.xml" ./usr/share/metainfo/
 mv -v * "./$APP.AppDir"
 # Move the image icon into place
 cp -v "$ORIG_DIR/$APP.png" "./$APP.AppDir"
+#}
+#stage_1
+#stage_2
 # Download the appimage tool which actually makes the Appimages
 wget "https://github.com/probonopd/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
 chmod -v a+x appimagetool-x86_64.AppImage
+curl https://github.com/probonopd/AppImageKit/releases/download/continuous/AppRun-x86_64 -o "$APP.AppDir/AppRun"
+chmod -v a+x "$APP.AppDir/AppRun"
 # AppImage tools are dumb and refuse to create the appimage, if this happens,
 # and it will, try again with -n option to force it
 ./appimagetool-x86_64.AppImage -v "$APP.AppDir" || ./appimagetool-x86_64.AppImage -v -n "$APP.AppDir"
 RETURN_CODE=$?
-mv "$(find . -name '*perl6*.AppImage')" "$ORIG_DIR" || RETURN_CODE=$?
-cd "$ORIG_DIR"
+IMAGE_NAME="$(find . -name '*perl6*.AppImage')"
+mv "$IMAGE_NAME" "$ORIG_DIR" && chmod -v +x "$IMAGE_NAME" || RETURN_CODE=$?
+cp -r "$APP.AppDir" "$ORIG_DIR"
+cd "$ORIG_DIR" || exit
+eval "$IMAGE_NAME --help"
 if [ $RETURN_CODE == 0 ]; then
-    sudo rm -rf /rsu
+  echo -n
+    #sudo rm -rf /rsu
 fi
 exit $RETURN_CODE
