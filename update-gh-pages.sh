@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # Adapted from script by Yuriy Tymchuk 2013
 # https://sleepycoders.blogspot.com/2013/03/sharing-travis-ci-generated-files.html
 
