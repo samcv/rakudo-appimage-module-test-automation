@@ -48,9 +48,9 @@ chmod -v a+x appimagetool-x86_64.AppImage
 # and it will, try again with -n option to force it
 ./appimagetool-x86_64.AppImage -v "$APP.AppDir" || ./appimagetool-x86_64.AppImage -v -n "$APP.AppDir"
 RETURN_CODE=$?
-mv "$(find . -name '*.AppImage')" "$ORIG_DIR"
+mv "$(find . -name '*perl6*.AppImage')" "$ORIG_DIR" || RETURN_CODE=$?
 cd "$ORIG_DIR"
 if [ $RETURN_CODE == 0 ]; then
-    sudo rm -rfv /rsu
+    sudo rm -rf /rsu
 fi
-return $RETURN_CODE
+exit $RETURN_CODE
