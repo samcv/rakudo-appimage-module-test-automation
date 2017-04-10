@@ -2,6 +2,7 @@
 APP=perl6
 ID=org.perl6.rakudo
 ORIG_DIR="$(pwd)"
+if [ ! "$P6SCRIPT" ]; then P6SCRIPT=stable; fi
 echo "ORIG_DIR=$ORIG_DIR APP=$APP ID=$ID"
 #stage_1 () {
 sudo mkdir -v /rsu || sudo rm -rfv /rsu && sudo mkdir -v /rsu
@@ -35,13 +36,14 @@ make || exit
 make install || exit
 cd /rsu || exit
 echo "Replacing path in binaries"
+exit
 find . -type f | xargs -I '{}' sed -i -e 's|/rsu|././|g' '{}'
 mkdir -p -v usr
 # AppImage documentation is bad. We must install into some directory (handpaths get coded into one directory), and then we need to then MOVE them to a new folder usr
 # If we don't move everything to usr (even though we didn't do --prefix for that) paths won't match up and it won't start
 mv * ./usr
 echo "Now you need to fix usr/bin/perl6 script"
-cp -v "$ORIG_DIR/perl6" ./usr/bin/perl6
+cp -v "$ORIG_DIR/perl6-$P6SCRIPT" ./usr/bin/perl6
 chmod -v +x ./usr/bin/perl6
 mkdir -v "$APP.AppDir"
 #cd -v "$APP.AppDir"
