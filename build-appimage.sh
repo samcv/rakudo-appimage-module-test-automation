@@ -34,6 +34,7 @@ fi
 make || exit
 make install || exit
 cd /rsu || exit
+echo "Replacing path in binaries"
 find . -type f | xargs -I '{}' sed -i -e 's|/rsu|././|g' '{}'
 mkdir -p -v usr
 # AppImage documentation is bad. We must install into some directory (handpaths get coded into one directory), and then we need to then MOVE them to a new folder usr
@@ -62,14 +63,17 @@ mv -v  AppRun-x86_64 "$APP.AppDir/AppRun"
 # AppImage tools are dumb and refuse to create the appimage, if this happens,
 # and it will, try again with -n option to force it
 ./appimagetool-x86_64.AppImage -v "$APP.AppDir" || ./appimagetool-x86_64.AppImage -v -n "$APP.AppDir"
-RETURN_CODE=$?
 IMAGE_NAME="$(find . -name '*perl6*.AppImage')"
-mv "$IMAGE_NAME" "$ORIG_DIR" && chmod -v +x "$IMAGE_NAME" || RETURN_CODE=$?
+mv "$IMAGE_NAME" "$ORIG_DIR"
 cp -r "$APP.AppDir" "$ORIG_DIR"
 cd "$ORIG_DIR" || exit
-eval "$IMAGE_NAME --help"
+echo "Testing if $IMAGE_NAME --version works"
+eval "$IMAGE_NAME --version"
+RETURN_CODE=$?
+
 if [ $RETURN_CODE == 0 ]; then
   echo -n
     #sudo rm -rf /rsu
 fi
+echo "Image build as $IMAGE_NAME"
 exit $RETURN_CODE
