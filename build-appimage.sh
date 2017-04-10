@@ -29,7 +29,7 @@ else
         git clone https://github.com/rakudo/rakudo.git || exit
         cd rakudo || exit
     fi
-    perl Configure.pl --prefix="/rsu"--gen-moar --gen-nqp --backends=moar || exit
+    perl Configure.pl --prefix="/rsu" --gen-moar --gen-nqp --backends=moar || exit
 fi
 make || exit
 make install || exit
