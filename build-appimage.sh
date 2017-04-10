@@ -2,7 +2,8 @@
 APP=perl6
 ID=org.perl6.rakudo
 
-PWD=$(pwd)
+ORIG_DIR="$(pwd)"
+echo $ORIG_DIR
 sudo mkdir -p -v /rsu
 sudo chown $(whoami):$(whoami) /rsu || exit
 #cd /rsu
@@ -14,11 +15,22 @@ make || exit
 make install || exit
 cd /rsu || exit
 find . -type f | xargs -I '{}' sed -i -e 's|/rsu|././|g' '{}'
-mkdir -p usr
+mkdir -p -v usr
+# AppImage documentation is bad. We must install into some directory (handpaths get coded into one directory), and then we need to then MOVE them to a new folder usr
+# If we don't move everything to usr (even though we didn't do --prefix for that) paths won't match up and it won't start
 mv * ./usr
 echo "Now you need to fix usr/bin/perl6 script"
-cp $PWD/perl6 ./usr/bin/perl6
-chmod +x ./usr/bin/perl6
-mkdir -v "$APP.AppImage" || exit
-cd install || exit
-cp "$PWD/$ID.desktop" "./$APP.AppImage"
+cp -v $ORIG_DIR/perl6 ./usr/bin/perl6
+chmod -v +x ./usr/bin/perl6
+mkdir -v "$APP.AppDir"
+cd -v "$APP.AppDir"
+cp -v "$ORIG_DIR/$ID.desktop" "./$APP.AppDir"
+# TODO use `install` instead of mkdir and other things to be more correct
+mkdir -p -v ./usr/share/metainfo/
+cp -v "$ORIG_DIR/$ID.appdata.xml" ./usr/share/metainfo/
+# Download the appimage tool which actually makes the Appimages
+wget "https://github.com/probonopd/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+chmod -v a+x appimagetool-x86_64.AppImage
+# AppImage tools are dumb and refuse to create the appimage, if this happens,
+# and it will, try again with -n option to force it
+./appimagetool-x86_64.AppImage -v "$APP.AppDir" || ./appimagetool-x86_64.AppImage -v -n "$APP.AppDir"
