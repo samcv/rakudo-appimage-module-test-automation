@@ -5,27 +5,30 @@ cd "$OWD"
 i=$(($#-1))
 function argv {
     for a in ${BASH_ARGV[*]} ; do
-      arg="$a"
-      if [ "$APPIMAGE_DEBUG" ]; then echo $i; fi
-      first_letter=$(printf %.1s "$arg")
-      if [ $first_letter != '-' ]; then
-        arg=$(readlink -f "$arg")
-      fi
-      NEWARGS[$i]="$arg"
-      i=$((i-1))
+        arg="$a"
+        if [ "$APPIMAGE_DEBUG" ]; then printf "Got Arg:       %s is ‘%s’\n" "$i" "$arg" 1>&2; fi
+        first_letter=$(printf %.1s "$arg")
+        if [ $first_letter != '-' ]; then
+            arg=$(readlink -f "$arg")
+        fi
+        NEWARGS[$i]="$arg"
+        i=$((i-1))
     done
 }
 argv
 function debug {
-  for a in ${NEWARGS[*]} ; do
-    echo $a
-  done
+    temp_j=0
+    for a in ${NEWARGS[*]} ; do
+        printf "Passing on Arg $temp_j is ‘%s’\n" "$a" 1>&2
+        temp_j=$((temp_j+1))
+    done
+    if [ $temp_j == 0 ]; then echo "Did not see any command line args" 1>&2; fi
 }
 if [ "$APPIMAGE_DEBUG" ]; then debug; fi
 
 cd "$IMAGE_PWD"
-exec ./bin/moar  --execname="$APPIMAGE" --libpath="././share/nqp/lib" --libpath="././share/nqp/lib" \
---libpath="././share/perl6/lib" \
---libpath="././share/perl6/runtime" \
+exec ./bin/moar  --execname="$0" --libpath="./share/nqp/lib" --libpath="./share/nqp/lib" \
+--libpath="./share/perl6/lib" \
+--libpath="./share/perl6/runtime" \
 ././share/perl6/runtime/perl6.moarvm \
 "${NEWARGS[@]}"
