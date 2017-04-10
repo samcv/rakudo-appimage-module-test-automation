@@ -7,9 +7,10 @@ echo $ORIG_DIR
 sudo mkdir -p -v /rsu
 sudo chown $(whoami):$(whoami) /rsu || exit
 #cd /rsu
-wget http://rakudo.org/downloads/star/rakudo-star-latest.tar.gz
-tar -xf rakudo-star*.tar.gz || exit
-cd rakudo-star* || exit
+TAR_GZ=rakudo-star-latest.tar.gz
+wget http://rakudo.org/downloads/star/$TAR_GZ
+tar -xf $TAR_GZ || exit
+cd $TAR_GZ || exit
 perl ./Configure.pl --prefix="/rsu" --backends=moar --gen-moar || exit
 make || exit
 make install || exit
@@ -38,3 +39,10 @@ chmod -v a+x appimagetool-x86_64.AppImage
 # AppImage tools are dumb and refuse to create the appimage, if this happens,
 # and it will, try again with -n option to force it
 ./appimagetool-x86_64.AppImage -v "$APP.AppDir" || ./appimagetool-x86_64.AppImage -v -n "$APP.AppDir"
+RETURN_CODE=$?
+mv "$(find . -name '*.AppImage')" "$ORIG_DIR"
+cd "$ORIG_DIR"
+if [ $RETURN_CODE == 0 ]; then
+    rm -rfv /rsu
+fi
+return $RETURN_CODE
