@@ -30,6 +30,8 @@ mkdir -p -v ./usr/share/metainfo/
 cp -v "$ORIG_DIR/$ID.appdata.xml" ./usr/share/metainfo/
 # Ok, everything should be READY by this point XXX move things into place
 mv -v * "./$APP.AppDir"
+# Move the image icon into place
+cp -v "$ORIG_DIR/$APP.png" "./$APP.AppDir"
 # Download the appimage tool which actually makes the Appimages
 wget "https://github.com/probonopd/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
 chmod -v a+x appimagetool-x86_64.AppImage

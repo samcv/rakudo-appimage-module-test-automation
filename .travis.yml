@@ -17,6 +17,7 @@ addons:
     # add PPAs with more up-to-date toolchains
     #- ubuntu-toolchain-r-test
     packages:
+        - appstream
     # install toolchains
     #- gcc-6
 #    - openjdk-7-jdk
