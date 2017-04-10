@@ -25,7 +25,6 @@ script:
     - APPIMAGE="$(find . -name '*.AppImage')"
     - echo "Testing launching scripts and using modules" && eval "$APPIMAGE $(pwd)/t/00-exists.t"
     - ./update-gh-pages.sh
-#    - eval "APPIMAGE_DEBUG=1 $(find . -name '*.AppImage') -e 'use Terminal::ANSIColor; say colored(‘what a lovely colours!’, ‘underline red on_green’);" || pwd; ls -lh
 
 on_success:
 branches:
@@ -43,15 +42,16 @@ notifications:
       - "%{build_url} %{compare_url}"
 
 env:
-    - BLEAD=1 secure: "VPg7KrxBN8TGz8TeNm1DyKnNWQpS2HKwmxZZvlHASYw6C7B313wMJLiiKbRmMuZsSMdJ2dLLz/1DeeiUSELHlrO4oAjkhavejPQBOJAy+KDKehMJBbq/u/FZPWXbYA9V5B6/ciGpuJtoW3hND7rcSYFChZPFEAnC9IrzPEn4WZzwuMs+PpJxQd8NoAyLjxoKjoi5XXvFnw1x2tefBG9kv4Ny84LfRhw2nRiv/pcIcoL3GqiQnNyZ4fTY9CAh3iZ3C5ZTmcpWpmoS8YtylJESiix8quKXgEuhFJvNYgx+LODbFW81fk3sg9WpY3v0r2sxCWZlBJ/S8MhzySbbhqbiPqrubVs8x2jwXJl3I958skr9lDel0rdSllKwKYWzqe2dHthAc41sH5ow25bq9MmH2/+PBdTRip/SPcv1di7iQSrImReHMBdydfyYCvBu6J1f7VDEZpyUin99SgXgSnnsJvBDIMzvUzhg4TeW05smcJzeSn4WoWDnjZ+UvQsnVOYkW9FSSVbrWwBksIrCJk5eYck2UvUibdx/lWc+hf/qHGfYjgVetYP/ZQnTMRR6H/agT683osKmAe8SFQcsFsML9h+qcS8XYctAab8CYFye/2Dv/nMmiDcJfmcfQU9r0BTSPu1BaTQJYU5X7yfDK2D1K+eniAB3oo3HQvVyMSbMasU="
+  global:
     - secure: "VPg7KrxBN8TGz8TeNm1DyKnNWQpS2HKwmxZZvlHASYw6C7B313wMJLiiKbRmMuZsSMdJ2dLLz/1DeeiUSELHlrO4oAjkhavejPQBOJAy+KDKehMJBbq/u/FZPWXbYA9V5B6/ciGpuJtoW3hND7rcSYFChZPFEAnC9IrzPEn4WZzwuMs+PpJxQd8NoAyLjxoKjoi5XXvFnw1x2tefBG9kv4Ny84LfRhw2nRiv/pcIcoL3GqiQnNyZ4fTY9CAh3iZ3C5ZTmcpWpmoS8YtylJESiix8quKXgEuhFJvNYgx+LODbFW81fk3sg9WpY3v0r2sxCWZlBJ/S8MhzySbbhqbiPqrubVs8x2jwXJl3I958skr9lDel0rdSllKwKYWzqe2dHthAc41sH5ow25bq9MmH2/+PBdTRip/SPcv1di7iQSrImReHMBdydfyYCvBu6J1f7VDEZpyUin99SgXgSnnsJvBDIMzvUzhg4TeW05smcJzeSn4WoWDnjZ+UvQsnVOYkW9FSSVbrWwBksIrCJk5eYck2UvUibdx/lWc+hf/qHGfYjgVetYP/ZQnTMRR6H/agT683osKmAe8SFQcsFsML9h+qcS8XYctAab8CYFye/2Dv/nMmiDcJfmcfQU9r0BTSPu1BaTQJYU5X7yfDK2D1K+eniAB3oo3HQvVyMSbMasU="
-    #- RAKUDO_OPTIONS="--backends=moar --gen-nqp        --gen-moar"
-    #- RAKUDO_OPTIONS="--backends=moar --gen-nqp=master --gen-moar"
-    #- RAKUDO_OPTIONS="--backends=moar --gen-nqp=master --gen-moar=master"
-    #- RAKUDO_OPTIONS="--backends=jvm  --gen-nqp"
-    #- RAKUDO_OPTIONS="--backends=jvm  --gen-nqp=master"
+  matrix:
+    - BLEAD=1 P6SCRIPT=testing
+    - BLEAD=1 P6SCRIPT=stable
+    - STAR=1  P6SCRIPT=stable
+    - STAR=1  P6SCRIPT=testing
+
 
 matrix:
   allow_failures:
-    #- env: RAKUDO_OPTIONS="--backends=jvm  --gen-nqp"
-#    - env: RAKUDO_OPTIONS="--backends=jvm  --gen-nqp=master"
+    - env: BLEAD=1 P6SCRIPT=testing
+    - env: STAR=1  P6SCRIPT=testing
