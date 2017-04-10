@@ -20,14 +20,16 @@ mkdir -p -v usr
 # If we don't move everything to usr (even though we didn't do --prefix for that) paths won't match up and it won't start
 mv * ./usr
 echo "Now you need to fix usr/bin/perl6 script"
-cp -v $ORIG_DIR/perl6 ./usr/bin/perl6
+cp -v "$ORIG_DIR/perl6" ./usr/bin/perl6
 chmod -v +x ./usr/bin/perl6
 mkdir -v "$APP.AppDir"
-cd -v "$APP.AppDir"
+#cd -v "$APP.AppDir"
 cp -v "$ORIG_DIR/$ID.desktop" "./$APP.AppDir"
 # TODO use `install` instead of mkdir and other things to be more correct
 mkdir -p -v ./usr/share/metainfo/
 cp -v "$ORIG_DIR/$ID.appdata.xml" ./usr/share/metainfo/
+# Ok, everything should be READY by this point XXX move things into place
+mv -v * "./$APP.AppDir"
 # Download the appimage tool which actually makes the Appimages
 wget "https://github.com/probonopd/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
 chmod -v a+x appimagetool-x86_64.AppImage
