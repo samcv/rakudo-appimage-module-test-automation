@@ -1,31 +1,4 @@
-#!/usr/bin/env bash
-#Get the directory you ran the script from
-IMAGE_PWD="$(pwd)"
-cd "$OWD"
-i=$(($#-1))
-function argv {
-    for a in ${BASH_ARGV[*]} ; do
-      arg="$a"
-      if [ "$APPIMAGE_DEBUG" ]; then echo $i; fi
-      first_letter=$(printf %.1s "$arg")
-      if [ $first_letter != '-' ]; then
-        arg=$(readlink -f "$arg")
-      fi
-      NEWARGS[$i]="$arg"
-      i=$((i-1))
-    done
-}
-argv
-function debug {
-  for a in ${NEWARGS[*]} ; do
-    echo $a
-  done
-}
-if [ "$APPIMAGE_DEBUG" ]; then debug; fi
-
-cd "$IMAGE_PWD"
-exec ./bin/moar  --execname="$APPIMAGE" --libpath="././share/nqp/lib" --libpath="././share/nqp/lib" \
---libpath="././share/perl6/lib" \
---libpath="././share/perl6/runtime" \
-././share/perl6/runtime/perl6.moarvm \
-"${NEWARGS[@]}"
+#!/bin/sh
+exec ./bin/moar  --execname="$0" --libpath="././share/nqp/lib" \
+--libpath="././share/nqp/lib" --libpath="././share/perl6/lib" \
+--libpath="././share/perl6/runtime" ././share/perl6/runtime/perl6.moarvm "$@"
