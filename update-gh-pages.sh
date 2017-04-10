@@ -7,7 +7,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
 
   #copy data we're interested in to other place
   mkdir -p $HOME/staging
-  APPIMAGENAME=$(find . -name '*.AppImage')
+  APPIMAGENAME=$(basename "$(find . -name '*.AppImage')")
   if [ "$BLEAD" ]; then
       mv "$APPIMAGENAME" "blead-$APPIMAGENAME"
   else
