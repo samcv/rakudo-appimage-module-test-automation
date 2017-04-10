@@ -1,26 +1,36 @@
 #!/usr/bin/env bash
 APP=perl6
 ID=org.perl6.rakudo
-
 ORIG_DIR="$(pwd)"
 echo "ORIG_DIR=$ORIG_DIR APP=$APP ID=$ID"
 #stage_1 () {
 sudo mkdir -v /rsu || sudo rm -rfv /rsu && sudo mkdir -v /rsu
 sudo chown -R $(whoami):$(whoami) /rsu || exit
-TAR_GZ=rakudo-star-latest.tar.gz
-check_tar () { gzip -tv $TAR_GZ; }
-# IF we already have the download, check its integrity, otherwise delete
-if [ -f $TAR_GZ ]; then
-    check_tar || rm -fv $TAR_GZ
+sudo chmod 755 /rsu
+if [ ! "$BLEAD" ]; then
+    TAR_GZ=rakudo-star-latest.tar.gz
+    check_tar () { gzip -tv $TAR_GZ; }
+    # IF we already have the download, check its integrity, otherwise delete
+    if [ -f $TAR_GZ ]; then
+        check_tar || rm -fv $TAR_GZ
+    fi
+    if [ ! -f $TAR_GZ ]; then
+        wget http://rakudo.org/downloads/star/$TAR_GZ
+    fi
+    printf "Checking the compressed file integrity.\n"
+    gzip -tv $TAR_GZ
+    tar -xf $TAR_GZ || exit
+    cd "$(find . -name 'rakudo-star*' -type d)" || exit
+    perl ./Configure.pl --prefix="/rsu" --backends=moar --gen-moar || exit
+else
+    if [ -d 'rakudo' ]; then
+        cd 'rakudo' && git pull
+    else
+        git clone https://github.com/rakudo/rakudo.git || exit
+        cd rakudo || exit
+    fi
+    perl Configure.pl --prefix="/rsu"--gen-moar --gen-nqp --backends=moar || exit
 fi
-if [ ! -f $TAR_GZ ]; then
-    wget http://rakudo.org/downloads/star/$TAR_GZ
-fi
-printf "Checking the compressed file integrity.\n"
-gzip -tv $TAR_GZ
-tar -xf $TAR_GZ || exit
-cd "$(find . -name 'rakudo-star*' -type d)" || exit
-perl ./Configure.pl --prefix="/rsu" --backends=moar --gen-moar || exit
 make || exit
 make install || exit
 cd /rsu || exit
@@ -42,9 +52,7 @@ cp -v "$ORIG_DIR/$ID.appdata.xml" ./usr/share/metainfo/
 mv -v * "./$APP.AppDir"
 # Move the image icon into place
 cp -v "$ORIG_DIR/$APP.png" "./$APP.AppDir"
-#}
-#stage_1
-#stage_2
+
 # Download the appimage tool which actually makes the Appimages
 wget --tries=5 "https://github.com/probonopd/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
 chmod -v a+x appimagetool-x86_64.AppImage

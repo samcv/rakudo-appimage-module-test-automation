@@ -39,6 +39,8 @@ notifications:
       - "%{build_url} %{compare_url}"
 
 env:
+    - BLEAD=1
+    - madeupenvvar=0
     #- RAKUDO_OPTIONS="--backends=moar --gen-nqp        --gen-moar"
     #- RAKUDO_OPTIONS="--backends=moar --gen-nqp=master --gen-moar"
     #- RAKUDO_OPTIONS="--backends=moar --gen-nqp=master --gen-moar=master"
