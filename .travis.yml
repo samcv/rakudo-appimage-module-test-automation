@@ -22,8 +22,10 @@ addons:
 #    - openjdk-7-jdk
 
 script:
+    - chmod +x build-appimage.sh
+    - ./build-appimage.sh
 #    - perl Configure.pl $RAKUDO_OPTIONS --moar-option=--cc=$(command -v gcc-6 >/dev/null 2>&1; if [ $? -eq 1 ]; then printf "gcc"; else printf "gcc-6"; fi)
-    - "make test"
+    #- #"make test"
 #    - "make install"
 
 branches:
