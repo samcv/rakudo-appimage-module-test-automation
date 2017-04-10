@@ -1,0 +1,54 @@
+language: perl
+
+os:
+    - linux
+#    - osx
+
+sudo: true
+
+#fast_finish: true
+
+install: "echo"
+dist: trusty
+
+addons:
+  apt:
+    sources:
+    # add PPAs with more up-to-date toolchains
+    #- ubuntu-toolchain-r-test
+    packages:
+    # install toolchains
+    #- gcc-6
+#    - openjdk-7-jdk
+
+script:
+#    - perl Configure.pl $RAKUDO_OPTIONS --moar-option=--cc=$(command -v gcc-6 >/dev/null 2>&1; if [ $? -eq 1 ]; then printf "gcc"; else printf "gcc-6"; fi)
+    - "make test"
+#    - "make install"
+
+branches:
+   only:
+     #- nom
+     - /.*/
+
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.net#perl6-dev"
+    on_success: never
+    on_failure: never
+    template:
+      - "Rakudo build %{result}. %{author} '%{commit_message}'"
+      - "%{build_url} %{compare_url}"
+
+env:
+    #- RAKUDO_OPTIONS="--backends=moar --gen-nqp        --gen-moar"
+    #- RAKUDO_OPTIONS="--backends=moar --gen-nqp=master --gen-moar"
+    #- RAKUDO_OPTIONS="--backends=moar --gen-nqp=master --gen-moar=master"
+    #- RAKUDO_OPTIONS="--backends=jvm  --gen-nqp"
+    #- RAKUDO_OPTIONS="--backends=jvm  --gen-nqp=master"
+
+matrix:
+  allow_failures:
+    #- env: RAKUDO_OPTIONS="--backends=jvm  --gen-nqp"
+#    - env: RAKUDO_OPTIONS="--backends=jvm  --gen-nqp=master"
