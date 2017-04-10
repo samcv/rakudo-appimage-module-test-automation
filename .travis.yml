@@ -22,7 +22,9 @@ addons:
 script:
     - chmod +x build-appimage.sh
     - ./build-appimage.sh
-    - eval "APPIMAGE_DEBUG=1 $(find . -name '*.AppImage') -e 'use Terminal::ANSIColor; say colored(‘what a lovely colours!’, ‘underline red on_green’);" || pwd; ls -lh
+    - APPIMAGE="$(find . -name '*.AppImage')"
+    - echo "Testing launching scripts from a relative location" && eval "$APPIMAGE t/00-exists.t"
+#    - eval "APPIMAGE_DEBUG=1 $(find . -name '*.AppImage') -e 'use Terminal::ANSIColor; say colored(‘what a lovely colours!’, ‘underline red on_green’);" || pwd; ls -lh
 
 branches:
    only:
