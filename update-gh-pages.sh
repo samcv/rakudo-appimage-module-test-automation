@@ -32,13 +32,13 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
   # Copy our files from staging to the repo
   cp -Rf $HOME/staging/* .
-  if [ -z `git diff --exit-code` ]; then
-    printf "No changes to the output on this push; exiting.\n"
-    exit 0
-  fi
+  #if [ -z `git diff --exit-code` ]; then
+  #  printf "No changes to the output on this push; exiting.\n"
+  #  exit 0
+  #fi
   #add, commit and push files
   git add -fv .
-  git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to $TARGET_BRANCH"
+  git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to $TARGET_BRANCH" && \
   git push -fv origin $TARGET_BRANCH
 
   echo -e "Done magic with push\n"
