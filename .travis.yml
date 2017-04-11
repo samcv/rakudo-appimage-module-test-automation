@@ -47,7 +47,7 @@ script:
   - cd "$RAKUDO_DIR"
   #- pwd
 #  - ls -lh
-  - /usr/bin/perl t/* || echo "Ignoring return value for Travis"
+  - TEST_JOBS=$(nproc) /usr/bin/perl t/harness5 t/01-sanity t/04-nativecall || echo "Ignoring return value for Travis"
 
 on_success:
   - ./update-gh-pages.sh
