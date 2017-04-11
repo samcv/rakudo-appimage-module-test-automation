@@ -1,8 +1,8 @@
 language: perl
 
 os:
-    - linux
-#    - osx
+  - linux
+# - osx
 
 sudo: true
 
@@ -22,10 +22,13 @@ dist: trusty
 addons:
   apt:
     packages:
-        - libappstream0
-        - libappstream-dev
-        - gir1.2-appstream
-        - appstream-index
+      # appstream needed for building the appimage
+      - libappstream0
+      - libappstream-dev
+      - gir1.2-appstream
+      - appstream-index
+      # noninteractive helper
+      - expect
 
 script:
     - chmod +x build-appimage.sh
