@@ -42,9 +42,11 @@ script:
   - sudo cp -v "$APPIMAGE" "$RAKUDO_DIR/perl6-m"
   - pwd
   - RAKUDO_DIR="$(find . -name 'rakudo*' -type d)"
-  - cd "$RAKUDO_DIR"
-  - pwd
   - ls -lh
+  - echo "Rakudo dir is $RAKUDO_DIR"
+  #- cd "$RAKUDO_DIR"
+  #- pwd
+#  - ls -lh
   - /usr/bin/perl t/* || echo "Ignoring return value for Travis"
 
 on_success:
