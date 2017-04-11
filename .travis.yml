@@ -31,9 +31,12 @@ addons:
       - expect
 
 script:
+  - find_file () { readlink -f  "$(find . -maxdepth 1 -type f -name "$1" | head -n 1)"; }
+  - find_dir () { readlink -f  "$(find . -maxdepth 1 -type d -name "$1" | head -n 1)"; }
   - chmod +x build-appimage.sh
   - ./build-appimage.sh
-  - APPIMAGE="$(find . -name '*.AppImage' -maxdepth 1)"
+  - APPIMAGE=$(find_file '*.AppImage')
+  - printf 'AppImage is %s\n' "$APPIMAGE"
   - echo "Testing launching scripts and using modules"; eval "$APPIMAGE $(pwd)/t/00-exists.t"
   - eval "$APPIMAGE --help"
   - eval "$APPIMAGE --version"
@@ -41,7 +44,7 @@ script:
   # not sure why it was failing to copy...
   - sudo cp -v "$APPIMAGE" "$RAKUDO_DIR/perl6-m"
   - pwd
-  - RAKUDO_DIR="$(find . -name 'rakudo*' -type d -maxdepth 1)"
+  - RAKUDO_DIR=$(find_dir 'rakudo*')
   - ls -lh
   - echo "Rakudo dir is $RAKUDO_DIR"
   - cd "$RAKUDO_DIR"
