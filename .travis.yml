@@ -10,7 +10,7 @@ sudo: true
 
 install: "echo"
 before_install:
-  # Maybe don't need this
+  # Put github's into known_hosts /* may not need this */
   - printf "github.com,192.30.255.112 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n" >> ~/.ssh/known_hosts
   - openssl aes-256-cbc -K $encrypted_6f7e9e1784cd_key -iv $encrypted_6f7e9e1784cd_iv -in deploy_key.enc -out deploy_key -d;
   - chmod 600 deploy_key;
@@ -38,9 +38,8 @@ script:
   - eval "$APPIMAGE --help"
   - eval "$APPIMAGE --version"
   # Copy the appimage to perl6-m so we can do testing
-  - cp "$APPIMAGE" "$RAKUDO_DIR/perl6-m"
-  - cd "$RAKUDO_DIR"
-  - make test || echo "Ignoring return value for Travis"
+  # not sure why it was failing to copy...
+  - sudo cp -v "$APPIMAGE" "$RAKUDO_DIR/perl6-m" && cd "$RAKUDO_DIR" && /usr/bin/perl t/harness5 t/01-sanity t/04-nativecall || echo "Ignoring return value for Travis"
 
 on_success:
   - ./update-gh-pages.sh
