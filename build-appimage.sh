@@ -36,7 +36,6 @@ make || exit
 make install || exit
 cd /rsu || exit
 echo "Replacing path in binaries"
-exit
 find . -type f | xargs -I '{}' sed -i -e 's|/rsu|././|g' '{}'
 mkdir -p -v usr
 # AppImage documentation is bad. We must install into some directory (handpaths get coded into one directory), and then we need to then MOVE them to a new folder usr
