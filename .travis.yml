@@ -45,11 +45,13 @@ script:
   - ls -lh
   - echo "Rakudo dir is $RAKUDO_DIR"
   - cd "$RAKUDO_DIR"
+  - ls -lh
   #- pwd
 #  - ls -lh
   - TEST_JOBS=$(nproc) /usr/bin/perl t/harness5 t/01-sanity t/04-nativecall || echo "Ignoring return value for Travis"
 
-on_success:
+after_success:
+  - echo "Running on success options"
   - ./update-gh-pages.sh
 branches:
   only:
