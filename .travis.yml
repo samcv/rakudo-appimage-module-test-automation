@@ -44,7 +44,7 @@ script:
   - RAKUDO_DIR="$(find . -name 'rakudo*' -type d -maxdepth 1)"
   - ls -lh
   - echo "Rakudo dir is $RAKUDO_DIR"
-  #- cd "$RAKUDO_DIR"
+  - cd "$RAKUDO_DIR"
   #- pwd
 #  - ls -lh
   - /usr/bin/perl t/* || echo "Ignoring return value for Travis"
