@@ -6,7 +6,10 @@ TARGET_BRANCH="gh-pages"
 set -x
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  ]; then
   printf "Starting to update gh-pages\n"
-
+    # Save some useful information
+  REPO=`git config remote.origin.url`
+  SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
+  SHA=`git rev-parse --verify HEAD`
   #copy data we're interested in to other place
   mkdir -p "$HOME/staging"
   APPIMAGENAME=$(basename "$(find . -name '*.AppImage')")
@@ -22,10 +25,7 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   cd -- "$HOME" || echo "Couldn't cd into $HOME";
   git config --global user.email "travis@travis-ci.org"
   git config --global user.name "Travis"
-    # Save some useful information
-  REPO=`git config remote.origin.url`
-  SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
-  SHA=`git rev-parse --verify HEAD`
+
   git clone -v $REPO gh-pages
   cd gh-pages
   git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
