@@ -48,7 +48,6 @@ notifications:
 
 env:
   global:
-      - secure: "AknvzipSk63QpzDFCB/jRYjEX1vreBUVnahg8jPc3zE97bqSqFY0NVTFCH9zXYNNo/W2RfnEr96zP8M7JFDCQ8ok1V3fvbkl8CwC4kkmYt20EIOojLD96WaYgDn00qJoPzpleOwRYyqke9e1XXet6Nes8SMqv2BEBGGa0B1Cx344YvDIwcONc5UQtOQkonT3Vud4c3DAh5qfDjgKYe7kLQBZX712Plv6xMsWTuuarNIWZrf4T5+pBQjN4JGvEuT14m/4YXV+vuL3cSY9crNqwC/9jXm9ipxuijgW/iLB7eaMUjWUTkfqFpqDMvDsBD4FMVSyZva6Onc03VEPqjtRreloE/LUDQXrD1U9jcym/+khvzERnX+7ThPk5vpCuT0FZoRbZdzcITflYkJLfbJ/RIYny/x5pn+zRQ2WcQTu29U/3c4JMEgl2L2xPv6/pES8MpyvBf3nzfd900Mkn+yQbtBasNJPiajapz+Dku+AkclREWJHf38pj3CBPdJmaRiam7CUAhahuVTghEj3zGqGGyGNgQS50KUEtBDolhRk2079wiwKPg3wmCPBF6yD02tDhJyR0dfivBmcQTNxFPpnTDLnOZCjmOyFwCiqWMqLUfPbUF0qlv/oNL2Za2B6PDhuDYrDf84/ytpr429N4EqBcKFylJJpMJpmodY7nn5vwCI="
   matrix:
     - BLEAD=1 P6SCRIPT=testing
     - BLEAD=1 P6SCRIPT=stable
