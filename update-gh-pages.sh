@@ -4,7 +4,7 @@
 # https://sleepycoders.blogspot.com/2013/03/sharing-travis-ci-generated-files.html
 TARGET_BRANCH="gh-pages"
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  ]; then
-  printf -e "Starting to update gh-pages\n"
+  printf "Starting to update gh-pages\n"
 
   #copy data we're interested in to other place
   mkdir -p "$HOME/staging"
@@ -25,7 +25,7 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   REPO=`git config remote.origin.url`
   SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
   SHA=`git rev-parse --verify HEAD`
-  git clone $REPO gh-pages
+  git clone -v $REPO gh-pages
   cd gh-pages
   git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
   # Copy our files from staging to the repo
