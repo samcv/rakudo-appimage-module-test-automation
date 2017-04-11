@@ -51,6 +51,7 @@ script:
   - TEST_JOBS=$(nproc) /usr/bin/perl t/harness5 t/01-sanity t/04-nativecall || echo "Ignoring return value for Travis"
 
 after_success:
+  - cd "$TRAVIS_BUILD_DIR"
   - echo "Running on success options"
   - ./update-gh-pages.sh
 branches:
