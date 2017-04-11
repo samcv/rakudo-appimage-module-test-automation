@@ -34,6 +34,8 @@ else
 fi
 make || exit
 make install || exit
+# Copy the test files a level up for later testing
+cp -r -v ./t ../rakudo-t
 cd /rsu || exit
 echo "Replacing path in binaries"
 find . -type f | xargs -I '{}' sed -i -e 's|/rsu|././|g' '{}'
