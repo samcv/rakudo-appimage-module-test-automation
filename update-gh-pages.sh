@@ -12,7 +12,7 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   SHA=`git rev-parse --verify HEAD`
   #copy data we're interested in to other place
   mkdir -p "$HOME/staging"
-  APPIMAGENAME=$(basename "$(find . -name '*.AppImage')")
+  APPIMAGENAME=$(basename "$(find . -name '*.AppImage' -maxdepth 1)")
   if [ "$BLEAD" ]; then
     NAME="blead"
   else
