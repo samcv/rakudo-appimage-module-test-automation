@@ -39,6 +39,8 @@ make install || exit
 # Copy the test files a level up for later testing
 #cp -r -v ./t ../rakudo-t
 cd /rsu || exit
+echo "Dumping all found strings that has the original path in it"
+find . -type f  | xargs -I '{}' strings '{}' | grep '/rsu'
 echo "Replacing path in binaries"
 find . -type f | xargs -I '{}' sed -i -e 's|/rsu|././|g' '{}'
 mkdir -p -v usr
