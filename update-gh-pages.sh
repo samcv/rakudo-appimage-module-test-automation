@@ -24,11 +24,11 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   #go to home and setup git
   cd -- "$HOME" || echo "Couldn't cd into $HOME";
   git config user.name "Travis CI"
-  git config user.email "$COMMIT_AUTHOR_EMAIL"
-  #git config --global user.email "travis@travis-ci.org"
+  #git config user.email "$COMMIT_AUTHOR_EMAIL"
+  git config --global user.email "travis@travis-ci.org"
   #git config --global user.name "Travis"
 
-  git clone -v $REPO $TARGET_BRANCH
+  git clone -v $SSH_REPO $TARGET_BRANCH
   mkdir -p gh-pages
   cd gh-pages
   git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
@@ -39,6 +39,7 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   #  exit 0
   #fi
   #add, commit and push files
+  ls -lh
   git add -fv .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to $TARGET_BRANCH" && \
   git push -fv origin $TARGET_BRANCH

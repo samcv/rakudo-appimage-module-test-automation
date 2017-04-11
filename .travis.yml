@@ -10,10 +10,13 @@ sudo: true
 
 install: "echo"
 before_install:
+  # Maybe don't need this
+  - printf "github.com,192.30.255.112 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n" >> ~/.ssh/known_hosts
   - openssl aes-256-cbc -K $encrypted_6f7e9e1784cd_key -iv $encrypted_6f7e9e1784cd_iv -in deploy_key.enc -out deploy_key -d;
   - chmod 600 deploy_key;
   - eval `ssh-agent -s`
-  - ssh-add deploy_key
+  - expect -c 'spawn ssh-add ./deploy_key; expect "enter passphrase for"; send "\n"; expect "Identity added:"; interact'
+#  - ssh-add deploy_key
 dist: trusty
 
 addons:
@@ -23,6 +26,7 @@ addons:
         - libappstream-dev
         - gir1.2-appstream
         - appstream-index
+        - expect
 
 script:
     - chmod +x build-appimage.sh
