@@ -42,6 +42,7 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   ls -lh
   git add -fv .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to $TARGET_BRANCH" && \
+  git pull --rebase --ff-only && \
   git push -fv origin $TARGET_BRANCH
 
   echo -e "Done magic with push\n"
