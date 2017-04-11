@@ -31,17 +31,17 @@ addons:
       - expect
 
 script:
-    - chmod +x build-appimage.sh
-    - ./build-appimage.sh
-    - APPIMAGE="$(find . -name '*.AppImage')"
-    - echo "Testing launching scripts and using modules"; eval "$APPIMAGE $(pwd)/t/00-exists.t"
-    - eval "$APPIMAGE --help"
+  - chmod +x build-appimage.sh
+  - ./build-appimage.sh
+  - APPIMAGE="$(find . -name '*.AppImage')"
+  - echo "Testing launching scripts and using modules"; eval "$APPIMAGE $(pwd)/t/00-exists.t"
+  - eval "$APPIMAGE --help"
 
 on_success:
   - ./update-gh-pages.sh
 branches:
-   only:
-     - /.*/
+  only:
+    - /.*/
 
 notifications:
   irc:
