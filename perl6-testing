@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 #Get the directory you ran the script from
 IMAGE_PWD="$(pwd)"
-cd -- "$OWD"
-#i=$(($#-1))
+cd -- "$OWD" 1>&2
 count=0
 argv () {
     SKIP_NEXT=0
@@ -11,30 +10,14 @@ argv () {
         if [ "$APPIMAGE_DEBUG" ]; then printf "Got Arg:       %s is ‘%s’\n" $count "$i" 1>&2; fi
         count=$(($count+1))
         first_letter=$(printf %.1s "$arg")
-        if [[ "$arg" == "-e" || "$arg" == "--output=" ]]; then SKIP_NEXT=$(($SKIP_NEXT+1)); echo "skip next"; fi
-        if [[ $first_letter != '-' && $SKIP_NEXT < 1 ]]; then
+        if [[ "$arg" == "-e" || "$arg" == "--output=" ]]; then SKIP_NEXT=$(($SKIP_NEXT+1)); fi
+        if [[ $first_letter != '-' && $SKIP_NEXT -lt 1 ]]; then
             arg=$(readlink -f "$arg")
         fi
         NEWARGS[$count]="$arg"
     done
-    subfunc () {
-    for a in "${BASH_ARGV[@]}" ; do
-        arg="$a"
-        if [ "$APPIMAGE_DEBUG" ]; then printf "Got Arg:       %s is ‘%s’\n" "$i" "$arg" 1>&2; fi
-        first_letter=$(printf %.1s "$arg")
-
-        #if [ "$arg" == "--output="]; then SKIP_NEXT=1; fi
-        if [[ "$arg" == "-e" || "$arg" == "--output=" ]]; then SKIP_NEXT=1; echo "skip next"; fi
-
-        if [[ $first_letter != '-' && $SKIP_NEXT != 1 ]]; then
-            arg=$(readlink -f "$arg")
-        fi
-        NEWARGS[$i]="$arg"
-        i=$((i-1))
-    done
-    }
 }
-function debug {
+debug () {
     temp_j=0
     for a in "${NEWARGS[@]}" ; do
         printf "Passing on Arg $temp_j is ‘%s’\n" "$a" 1>&2
@@ -44,9 +27,11 @@ function debug {
 }
 argv "$@"
 
-if [ "$APPIMAGE_DEBUG" ]; then debug; fi
-
-cd -- "$IMAGE_PWD"
+if [ "$APPIMAGE_DEBUG" ]; then
+    debug;
+    printf "Changing directory to $IMAGE_PWD\n" 1>&2
+fi
+cd -- "$IMAGE_PWD" 1>&2
 exec ./bin/moar  --execname="$0" --libpath="./share/nqp/lib" --libpath="./share/nqp/lib" \
 --libpath="./share/perl6/lib" \
 --libpath="./share/perl6/runtime" \
