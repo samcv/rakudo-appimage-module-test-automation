@@ -36,6 +36,11 @@ script:
   - APPIMAGE="$(find . -name '*.AppImage')"
   - echo "Testing launching scripts and using modules"; eval "$APPIMAGE $(pwd)/t/00-exists.t"
   - eval "$APPIMAGE --help"
+  - eval "$APPIMAGE --version"
+  # Copy the appimage to perl6-m so we can do testing
+  - cp "$APPIMAGE" "$RAKUDO_DIR/perl6-m"
+  - cd "$RAKUDO_DIR"
+  - make test || echo "Ignoring return value for Travis"
 
 on_success:
   - ./update-gh-pages.sh
