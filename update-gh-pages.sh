@@ -3,6 +3,7 @@
 # and here https://gist.github.com/domenic/ec8b0fc8ab45f39403dd
 # https://sleepycoders.blogspot.com/2013/03/sharing-travis-ci-generated-files.html
 TARGET_BRANCH="gh-pages"
+set -x
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  ]; then
   printf "Starting to update gh-pages\n"
 
@@ -31,11 +32,11 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   # Copy our files from staging to the repo
   cp -Rf $HOME/staging/* .
   if [ -z `git diff --exit-code` ]; then
-    echo "No changes to the output on this push; exiting."
+    printf "No changes to the output on this push; exiting.\n"
     exit 0
   fi
   #add, commit and push files
-  git add -f .
+  git add -fv .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
   git push -fv origin gh-pages
 
