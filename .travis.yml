@@ -41,6 +41,7 @@ script:
   # not sure why it was failing to copy...
   - sudo cp -v "$APPIMAGE" "$RAKUDO_DIR/perl6-m"
   - pwd
+  - RAKUDO_DIR="$(find . -name 'rakudo*' -type d)"
   - cd "$RAKUDO_DIR"
   - pwd
   - ls -lh
