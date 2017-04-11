@@ -15,11 +15,11 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   else
     NAME='star'
   fi
-  mv "$APPIMAGENAME" "$NAME-${P6SCRIPT}${APPIMAGENAME}"
+  mv "$APPIMAGENAME" "$NAME-${P6SCRIPT}-${APPIMAGENAME}"
   cp *.AppImage $HOME/staging
 
   #go to home and setup git
-  cd -- "$HOME" || echo "Couldn't cd into $HOME"; exit 1
+  cd -- "$HOME" || echo "Couldn't cd into $HOME";
   git config --global user.email "travis@travis-ci.org"
   git config --global user.name "Travis"
     # Save some useful information
