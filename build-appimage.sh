@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+find_file () { readlink -f  "$(find . -maxdepth 1 -type f -name "$1" | head -n 1)"; }
+find_dir () { readlink -f  "$(find . -maxdepth 1 -type d -name "$1" | head -n 1)"; }
 APP=perl6
 ID=org.perl6.rakudo
 ORIG_DIR="$(pwd)"
 if [ ! "$P6SCRIPT" ]; then P6SCRIPT=stable; fi
-echo "ORIG_DIR=$ORIG_DIR APP=$APP ID=$ID"
+echo "ORIG_DIR=$ORIG_DIR APP=$APP ID=$ID P6SCRIPT=$P6SCRIPT"
 #stage_1 () {
 sudo mkdir -v /rsu || sudo rm -rfv /rsu && sudo mkdir -v /rsu
 sudo chown -R $(whoami):$(whoami) /rsu || exit
@@ -21,7 +23,7 @@ if [ ! "$BLEAD" ]; then
     printf "Checking the compressed file integrity.\n"
     gzip -tv $TAR_GZ
     tar -xf $TAR_GZ || exit
-    cd "$(find . -name 'rakudo-star*' -type d)" || exit
+    cd "$(find_dir 'rakudo-star*')" || exit
     perl ./Configure.pl --prefix="/rsu" --backends=moar --gen-moar || exit
 else
     if [ -d 'rakudo' ]; then
@@ -66,11 +68,11 @@ wget --tries=5 "https://github.com/probonopd/AppImageKit/releases/download/conti
 chmod -v a+x appimagetool-x86_64.AppImage
 wget --tries=5 "https://github.com/probonopd/AppImageKit/releases/download/continuous/AppRun-x86_64"
 chmod -v a+x AppRun-x86_64
-mv -v  AppRun-x86_64 "$APP.AppDir/AppRun"
+mv -v AppRun-x86_64 "$APP.AppDir/AppRun"
 # AppImage tools are dumb and refuse to create the appimage, if this happens,
 # and it will, try again with -n option to force it
 ./appimagetool-x86_64.AppImage -v "$APP.AppDir" || ./appimagetool-x86_64.AppImage -v -n "$APP.AppDir"
-IMAGE_NAME="$(find . -name '*perl6*.AppImage')"
+IMAGE_NAME="$(find_file '*perl6*.AppImage')"
 mv "$IMAGE_NAME" "$ORIG_DIR"
 cp -r "$APP.AppDir" "$ORIG_DIR"
 cd "$ORIG_DIR" || exit
@@ -80,7 +82,7 @@ RETURN_CODE=$?
 
 if [ $RETURN_CODE == 0 ]; then
   echo -n
-    #sudo rm -rf /rsu
+  if [ "$CI" ]; then sudo rm -rf /rsu; fi
 fi
-echo "Image build as $IMAGE_NAME"
+echo "Image built as $IMAGE_NAME"
 exit $RETURN_CODE
