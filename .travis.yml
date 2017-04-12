@@ -42,9 +42,9 @@ script:
   - eval "$APPIMAGE --version"
   # Copy the appimage to perl6-m so we can do testing
   # not sure why it was failing to copy...
+  - RAKUDO_DIR=$(find_dir 'rakudo*')
   - sudo cp -v "$APPIMAGE" "$RAKUDO_DIR/perl6-m"
   - pwd
-  - RAKUDO_DIR=$(find_dir 'rakudo*')
   - ls -lh
   - echo "Rakudo dir is $RAKUDO_DIR"
   - cd "$RAKUDO_DIR"
