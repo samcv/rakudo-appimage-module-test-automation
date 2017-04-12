@@ -33,6 +33,7 @@ addons:
 script:
   - find_file () { readlink -f  "$(find . -maxdepth 1 -type f -name "$1" | head -n 1)"; }
   - find_dir () { readlink -f  "$(find . -maxdepth 1 -type d -name "$1" | head -n 1)"; }
+  - STABLE_TEST="$(find_file 'stable-test.txt')"
   - chmod +x build-appimage.sh
   - ./build-appimage.sh
   - APPIMAGE=$(find_file '*.AppImage')
@@ -49,9 +50,14 @@ script:
   - echo "Rakudo dir is $RAKUDO_DIR"
   - cd "$RAKUDO_DIR"
   - ls -lh
+  - if [ "$STAR" ]; then cd rakudo; fi
   #- pwd
 #  - ls -lh
-  - TEST_JOBS=$(nproc) /usr/bin/perl t/harness5 t/01-sanity t/04-nativecall || echo "Ignoring return value for Travis"
+  # Tests that should pass
+  - perl t/harness5 $(cat $STABLE_TEST )
+  # Tests that may pass or may not pass
+  - echo "Following tests are the full test suite but are not part of travis return"
+  - /usr/bin/perl t/harness5 t/01-sanity t/04-nativecall || echo "Ignoring return value for Travis"
 
 after_success:
   - cd "$TRAVIS_BUILD_DIR"
