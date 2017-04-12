@@ -47,7 +47,7 @@ cd /rsu || exit
 # Only copy them over on CI so we don't copy over random junk
 if [[ "$CI" || "$COPY_PRECOMP" ]]; then
   rm -rf ~/.perl6/precomp/
-  RAKUDO_MODULE_DEBUG=yes LD_LIBRARY_PATH="./lib" ./bin/perl6
+  echo "say 'Welcome to Perl 6!'; exit 0;" | RAKUDO_MODULE_DEBUG=yes LD_LIBRARY_PATH="./lib" ./bin/perl6
   cp -r ~/.perl6/precomp/* /rsu/share/perl6/site/precomp
 fi
 echo "Dumping all found strings that has the original path in it"
