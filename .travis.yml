@@ -12,17 +12,20 @@ install: "echo"
 before_install:
   # Put github's into known_hosts /* may not need this */
   - printf "github.com,192.30.255.112 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n" >> ~/.ssh/known_hosts
+  # Decrypt deploy_key using Travis *magic* variables
   - openssl aes-256-cbc -K $encrypted_6f7e9e1784cd_key -iv $encrypted_6f7e9e1784cd_iv -in deploy_key.enc -out deploy_key -d;
+  # Change perms or ssh-agent will get mad at us
   - chmod 600 deploy_key;
   - eval `ssh-agent -s`
+  # Decrypted key has no password, but it will still ask for one. Use expect program to interact with it non-interactively
   - expect -c 'spawn ssh-add ./deploy_key; expect "enter passphrase for"; send "\n"; expect "Identity added:"; interact'
-#  - ssh-add deploy_key
 dist: trusty
 
 addons:
   apt:
     packages:
       # appstream needed for building the appimage
+      # TODO get appstream-cli installed too
       - libappstream0
       - libappstream-dev
       - gir1.2-appstream
@@ -44,15 +47,14 @@ script:
   # Copy the appimage to perl6-m so we can do testing
   # not sure why it was failing to copy...
   - RAKUDO_DIR=$(find_dir 'rakudo*')
+  # Rakudo Star's actual rakudo folder is inside the main one
+  - if [ "$STAR" ]; then RAKUDO_DIR="$RAKUDO_DIR/rakudo"; fi
   - sudo cp -v "$APPIMAGE" "$RAKUDO_DIR/perl6-m"
   - pwd
   - ls -lh
   - echo "Rakudo dir is $RAKUDO_DIR"
   - cd "$RAKUDO_DIR"
   - ls -lh
-  - if [ "$STAR" ]; then cd rakudo; fi
-  #- pwd
-#  - ls -lh
   # Tests that should pass
   - perl t/harness5 --verbosity=5 $(cat $STABLE_TEST )
   # Tests that may pass or may not pass
