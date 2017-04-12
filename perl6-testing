@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 #Get the directory you ran the script from
 IMAGE_PWD="$(pwd)"
 cd -- "$OWD" 1>&2

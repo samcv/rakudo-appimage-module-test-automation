@@ -57,7 +57,8 @@ find . -type f | xargs -I '{}' sed -i -e 's|/rsu|././|g' '{}'
 mkdir -p -v usr
 # AppImage documentation is bad. We must install into some directory (handpaths get coded into one directory), and then we need to then MOVE them to a new folder usr
 # If we don't move everything to usr (even though we didn't do --prefix for that) paths won't match up and it won't start
-mv * ./usr
+find . -maxdepth 1 ! -name 'usr' ! -name '.' -exec mv {} ./usr/ \;
+#find . -maxdepth 1 -exec mv * ./usr
 echo "Now you need to fix usr/bin/perl6 script"
 cp -v "$ORIG_DIR/perl6-$P6SCRIPT" ./usr/bin/perl6
 chmod -v +x ./usr/bin/perl6
