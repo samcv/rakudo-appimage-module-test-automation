@@ -41,7 +41,8 @@ script:
   - ./build-appimage.sh
   - APPIMAGE=$(find_file '*.AppImage')
   - printf 'AppImage is %s\n' "$APPIMAGE"
-  - echo "Testing launching scripts and using modules"; eval "$APPIMAGE $(pwd)/t/00-exists.t"
+  - echo "Testing launching scripts and using modules"
+  - eval "$APPIMAGE $(pwd)/t/01-import-module.t"
   - eval "$APPIMAGE --help"
   - eval "$APPIMAGE --version"
   # Copy the appimage to perl6-m so we can do testing
