@@ -48,7 +48,7 @@ cd /rsu || exit
 if [[ "$CI" || "$COPY_PRECOMP" ]]; then
   rm -rf ~/.perl6/precomp/
   echo "say 'Welcome to Perl 6!'; exit 0;" | RAKUDO_MODULE_DEBUG=yes LD_LIBRARY_PATH="./lib" ./bin/perl6
-  cp -r ~/.perl6/precomp/* /rsu/share/perl6/site/precomp
+  cp -r ~/.perl6/precomp/* /rsu/share/perl6/site/precomp || echo "Didn't find any files to copy. Ignoring return values of cp"
 fi
 echo "Dumping all found strings that has the original path in it"
 find . -type f  | xargs -I '{}' strings '{}' | grep '/rsu'
