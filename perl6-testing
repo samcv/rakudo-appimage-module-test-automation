@@ -17,23 +17,26 @@ argv () {
         NEWARGS[$count]="$arg"
     done
 }
-debug () {
-    temp_j=0
-    for a in "${NEWARGS[@]}" ; do
-        printf "Passing on Arg $temp_j is ‘%s’\n" "$a" 1>&2
-        temp_j=$((temp_j+1))
-    done
-    if [ $temp_j == 0 ]; then printf "Did not see any command line args\n" 1>&2; fi
-}
 argv "$@"
 
 if [ "$APPIMAGE_DEBUG" ]; then
+    debug () {
+        temp_j=0
+        for a in "${NEWARGS[@]}" ; do
+            printf "Passing on Arg $temp_j is ‘%s’\n" "$a" 1>&2
+            temp_j=$((temp_j+1))
+        done
+        if [ $temp_j == 0 ]; then printf "Did not see any command line args\n" 1>&2; fi
+    }
     debug;
     printf "Changing directory to $IMAGE_PWD\n" 1>&2
 fi
 cd -- "$IMAGE_PWD" 1>&2
-exec ./bin/moar  --execname="$0" --libpath="./share/nqp/lib" --libpath="./share/nqp/lib" \
---libpath="./share/perl6/lib" \
---libpath="./share/perl6/runtime" \
-./share/perl6/runtime/perl6.moarvm \
+exec ./bin/moar  \
+    --execname="$0" \
+    --libpath="./share/nqp/lib" \
+    --libpath="./share/nqp/lib" \
+    --libpath="./share/perl6/lib" \
+    --libpath="./share/perl6/runtime" \
+    ./share/perl6/runtime/perl6.moarvm \
 "${NEWARGS[@]}"
