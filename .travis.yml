@@ -54,10 +54,10 @@ script:
   #- pwd
 #  - ls -lh
   # Tests that should pass
-  - perl t/harness5 $(cat $STABLE_TEST )
+  - perl t/harness5 --verbosity=5 $(cat $STABLE_TEST )
   # Tests that may pass or may not pass
   - echo "Following tests are the full test suite but are not part of travis return"
-  - /usr/bin/perl t/harness5 t/01-sanity t/04-nativecall || echo "Ignoring return value for Travis"
+  - /usr/bin/perl t/harness5 --verbosity=5 t/01-sanity t/04-nativecall || echo "Ignoring return value for Travis"
 
 after_success:
   - cd "$TRAVIS_BUILD_DIR"
