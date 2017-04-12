@@ -1,10 +1,12 @@
 #!/bin/bash
-# Script author: Peter van der Does on website stackoverflow.com
+# Adapted from script by 'Peter van der Does' on website stackoverflow.com
 # CC-by-SA
 # https://stackoverflow.com/questions/21395159/shell-script-to-create-a-static-html-directory-listing
 root="."
 echo "<ul>"
-for file in "$root"/*/*; do
+DEPTH=1
+files="$(find $root -maxdepth $DEPTH)"
+for file in $files; do
   parentpath="${file#*/}"
   parent="${parentpath%/*}"
   filename="${file##*/}"
