@@ -93,4 +93,5 @@ if [ $RETURN_CODE == 0 ]; then
   if [ "$CI" ]; then sudo rm -rf /rsu; fi
 fi
 echo "Image built as $IMAGE_NAME"
-exit $RETURN_CODE
+exit 0
+#exit $RETURN_CODE
