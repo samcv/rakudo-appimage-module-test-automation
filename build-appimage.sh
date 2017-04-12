@@ -8,8 +8,9 @@ ORIG_DIR="$(pwd)"
 if [ ! "$P6SCRIPT" ]; then P6SCRIPT=stable; fi
 echo "ORIG_DIR=$ORIG_DIR APP=$APP ID=$ID P6SCRIPT=$P6SCRIPT"
 #stage_1 () {
-sudo mkdir -v /rsu || sudo rm -rfv /rsu && sudo mkdir -v /rsu
-sudo chown -R $(whoami):$(whoami) /rsu || exit
+if [ -e '/rsu' ]; then sudo rm -rfv /rsu; fi
+sudo mkdir -v /rsu
+sudo chown -R "$(whoami):$(whoami)" /rsu
 sudo chmod 755 /rsu
 if [ ! "$BLEAD" ]; then
     TAR_GZ=rakudo-star-latest.tar.gz
