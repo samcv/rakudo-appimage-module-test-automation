@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+if [ "$CI" ]; then set -e; fi
 find_file () { readlink -f  "$(find . -maxdepth 1 -type f -name "$1" | head -n 1)"; }
 find_dir () { readlink -f  "$(find . -maxdepth 1 -type d -name "$1" | head -n 1)"; }
 APP=perl6
