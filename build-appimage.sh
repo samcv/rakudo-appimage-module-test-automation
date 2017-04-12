@@ -42,6 +42,13 @@ make install || exit
 # Copy the test files a level up for later testing
 #cp -r -v ./t ../rakudo-t
 cd /rsu || exit
+# If Linenoise/Readline is installed this is to generate precomp
+# Only copy them over on CI so we don't copy over random junk
+if [[ "$CI" || "$COPY_PRECOMP" ]]; then
+  rm -rf ~/.perl6/precomp/
+  RAKUDO_MODULE_DEBUG=yes LD_LIBRARY_PATH="./lib" ./bin/perl6
+  cp -r ~/.perl6/precomp/* /rsu/share/perl6/site/precomp
+fi
 echo "Dumping all found strings that has the original path in it"
 find . -type f  | xargs -I '{}' strings '{}' | grep '/rsu'
 echo "Replacing path in binaries"
