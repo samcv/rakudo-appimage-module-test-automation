@@ -3,40 +3,60 @@
 IMAGE_PWD="$(pwd)"
 cd -- "$OWD" 1>&2
 count=0
+# Just a number for debugging so we can seperate debug prints from different
+# launches of the script
+RUNNO=$(date +%N)
+# POSIX shell hack to save the state of $@
+save () {
+    for i do printf %s\\n "$i" | sed "s/'/'\\\\''/g;1s/^/'/;\$s/\$/' \\\\/" ; done
+    echo " "
+}
+add_arg () {
+    printf %s\\n "$1" | sed "s/'/'\\\\''/g;1s/^/'/;\$s/\$/' \\\\/";
+}
+# Save the state of the original array
+ORIG_ARRAY=$(save "$@")
+
 argv () {
     SKIP_NEXT=0
     for i in "$@"; do
         arg="$i"
-        if [ "$APPIMAGE_DEBUG" ]; then printf "Got Arg:       %s is ‘%s’\n" $count "$i" 1>&2; fi
         count=$(($count+1))
         first_letter=$(printf %.1s "$arg")
-        if [[ "$arg" == "-e" || "$arg" == "--output=" ]]; then SKIP_NEXT=$(($SKIP_NEXT+1)); fi
-        if [[ $first_letter != '-' && $SKIP_NEXT -lt 1 ]]; then
+        if [ "$arg" = "-e" ] || [ "$arg" = "--output=" ]; then SKIP_NEXT=$(($SKIP_NEXT+1)); fi
+        if [ $first_letter != '-' ] && [ $SKIP_NEXT -lt 1 ]; then
             arg=$(readlink -f "$arg")
         fi
-        NEWARGS[$count]="$arg"
+        if [ "$APPIMAGE_DEBUG" ]; then
+            printf "\n$RUNNO Got Arg:       %s is ‘%s’\n" $count "$i" 1>&2;
+            printf "$RUNNO Now Arg:       %s is ‘%s’\n" $count "$arg" 1>&2;
+        fi
+        if [ "$NEW_ARRAY" ]; then
+            NEW_ARRAY=$(printf "%s\n%s" "$NEW_ARRAY" "$(add_arg "$arg")");
+        else
+            NEW_ARRAY="$(add_arg "$arg")"
+        fi
     done
 }
 argv "$@"
-
+cd -- "$IMAGE_PWD" 1>&2 ;
+NEW_ARRAY=$(printf "%s \\n" "$NEW_ARRAY"; echo " ")
 if [ "$APPIMAGE_DEBUG" ]; then
-    debug () {
-        temp_j=0
-        for a in "${NEWARGS[@]}" ; do
-            printf "Passing on Arg $temp_j is ‘%s’\n" "$a" 1>&2
-            temp_j=$((temp_j+1))
-        done
-        if [ $temp_j == 0 ]; then printf "Did not see any command line args\n" 1>&2; fi
-    }
-    debug;
-    printf "Changing directory to $IMAGE_PWD\n" 1>&2
+    printf "$RUNNO Old array: {%s}\n" "$@" 1>&2;
+    printf "$RUNNO old ｢%s｣\n" "$ORIG_ARRAY" 1>&2;
 fi
-cd -- "$IMAGE_PWD" 1>&2
-exec ./bin/moar  \
-    --execname="$0" \
+
+eval "set -- $NEW_ARRAY"
+if [ "$APPIMAGE_DEBUG" ]; then
+    printf "$RUNNO New array: {%s}\n" "$@" 1>&2;
+    printf "%s new ｢%s｣\n" "$RUNNO" "$NEW_ARRAY" 1>&2;
+fi
+
+exec ./bin/moar \
+ "--execname=$0" \
     --libpath="./share/nqp/lib" \
     --libpath="./share/nqp/lib" \
     --libpath="./share/perl6/lib" \
     --libpath="./share/perl6/runtime" \
     ./share/perl6/runtime/perl6.moarvm \
-"${NEWARGS[@]}"
+"$@"
