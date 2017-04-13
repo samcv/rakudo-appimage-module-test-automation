@@ -18,6 +18,9 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$TARGET_BRANCH"  
   else
     NAME='star'
   fi
+  if [ "$ALL_MODULES" ]; then
+    NAME="$NAME-allmodules";
+  fi
   mv "$APPIMAGENAME" "$NAME-${P6SCRIPT}-${APPIMAGENAME}"
   cp *.AppImage $HOME/staging
 

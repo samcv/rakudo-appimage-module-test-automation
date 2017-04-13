@@ -48,6 +48,9 @@ cd /rsu || exit
 if [[ "$CI" || "$COPY_PRECOMP" ]]; then
   rm -rf ~/.perl6/precomp/
   echo "say 'Welcome to Perl 6!'; exit 0;" | RAKUDO_MODULE_DEBUG=yes LD_LIBRARY_PATH="./lib" ./bin/perl6
+  if [ "$ALL_MODULES" ]; then
+    /rsu/bin/perl6 "$ORIG_DIR/install_all_modules.p6"
+  fi
   cp -r ~/.perl6/precomp/* /rsu/share/perl6/site/precomp || echo "Didn't find any files to copy. Ignoring return values of cp"
 fi
 echo "Dumping all found strings that has the original path in it"
@@ -89,7 +92,7 @@ mv "$IMAGE_NAME" "$ORIG_DIR"
 cp -r "$APP.AppDir" "$ORIG_DIR"
 cd "$ORIG_DIR" || exit
 
-if [ $RETURN_CODE == 0 ]; then
+if [[ $RETURN_CODE == 0 ]]; then
   echo -n
   if [ "$CI" ]; then sudo rm -rf /rsu; fi
 fi
