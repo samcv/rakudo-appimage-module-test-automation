@@ -88,7 +88,7 @@ mv -v AppRun-x86_64 "$APP.AppDir/AppRun"
 # and it will, try again with -n option to force it
 ./appimagetool-x86_64.AppImage -v "$APP.AppDir" || ./appimagetool-x86_64.AppImage -v -n "$APP.AppDir"
 IMAGE_NAME="$(find_file '*perl6*.AppImage')"
-mv "$IMAGE_NAME" "$ORIG_DIR"
+cp -v "$IMAGE_NAME" "$ORIG_DIR"
 cp -r "$APP.AppDir" "$ORIG_DIR"
 cd "$ORIG_DIR" || exit
 

@@ -39,7 +39,7 @@ script:
   - STABLE_TEST="$(find_file 'stable-test.txt')"
   - chmod +x build-appimage.sh
   - ./build-appimage.sh
-  - APPIMAGE=$(find_file '*.AppImage') || echo "Could not find the AppImage. Trying to bail"; exit 1
+  - APPIMAGE=$(find_file '*.AppImage') || echo "Could not find the AppImage. Trying to bail"; pwd; ls -lh; exit 1
   - printf 'AppImage is %s\n' "$APPIMAGE"
   - echo "Testing launching scripts and using modules"
   - eval "$APPIMAGE $(pwd)/t/01-import-module.t"
