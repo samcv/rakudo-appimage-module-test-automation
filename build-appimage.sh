@@ -55,9 +55,10 @@ find . -type f  | xargs -I '{}' strings '{}' | grep '/rsu'
 echo "Replacing path in binaries"
 find . -type f | xargs -I '{}' sed -i -e 's|/rsu|././|g' '{}'
 mkdir -p -v usr
+move_all_to () { find . -maxdepth 1 -mindepth 1 ! -name "$1" -exec mv {} "$1" \; ;}
 # AppImage documentation is bad. We must install into some directory (handpaths get coded into one directory), and then we need to then MOVE them to a new folder usr
 # If we don't move everything to usr (even though we didn't do --prefix for that) paths won't match up and it won't start
-find . -maxdepth 1 ! -name 'usr' ! -name '.' -exec mv {} ./usr/ \;
+move_all_to usr
 #find . -maxdepth 1 -exec mv * ./usr
 echo "Now you need to fix usr/bin/perl6 script"
 cp -v "$ORIG_DIR/perl6-$P6SCRIPT" ./usr/bin/perl6
@@ -69,7 +70,8 @@ cp -v "$ORIG_DIR/$ID.desktop" "./$APP.AppDir"
 mkdir -p -v ./usr/share/metainfo/
 cp -v "$ORIG_DIR/$ID.appdata.xml" ./usr/share/metainfo/
 # Ok, everything should be READY by this point XXX move things into place
-mv -v * "./$APP.AppDir"
+move_all_to "$APP.AppDir"
+#mv -v * "./$APP.AppDir"
 # Move the image icon into place
 cp -v "$ORIG_DIR/$APP.png" "./$APP.AppDir"
 
