@@ -88,9 +88,6 @@ IMAGE_NAME="$(find_file '*perl6*.AppImage')"
 mv "$IMAGE_NAME" "$ORIG_DIR"
 cp -r "$APP.AppDir" "$ORIG_DIR"
 cd "$ORIG_DIR" || exit
-echo "Testing if $IMAGE_NAME --version works"
-eval "$IMAGE_NAME --version"
-RETURN_CODE=$?
 
 if [ $RETURN_CODE == 0 ]; then
   echo -n
@@ -98,4 +95,3 @@ if [ $RETURN_CODE == 0 ]; then
 fi
 echo "Image built as $IMAGE_NAME"
 exit 0
-#exit $RETURN_CODE
