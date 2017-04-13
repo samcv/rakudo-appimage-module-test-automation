@@ -87,7 +87,7 @@ env:
   global:
   matrix:
     - BLEAD=1 P6SCRIPT=testing
-    - BLEAD=1 P6SCRIPT=testing ALL_MODULES=1
+    - BLEAD=1 P6SCRIPT=stable ALL_MODULES=1
     - BLEAD=1 P6SCRIPT=stable
     - STAR=1  P6SCRIPT=stable
     - STAR=1  P6SCRIPT=testing
@@ -97,4 +97,4 @@ matrix:
   allow_failures:
     - env: BLEAD=1 P6SCRIPT=testing
     - env: STAR=1  P6SCRIPT=testing
-    - env: BLEAD=1 P6SCRIPT=testing ALL_MODULES=1
+    - env: BLEAD=1 P6SCRIPT=stable ALL_MODULES=1
