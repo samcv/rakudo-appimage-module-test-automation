@@ -11,5 +11,5 @@ my $modules = qx{/rsu/bin/zef list};
 $modules ~~ s:g/ ':' [ auth | ver ] '(' .*? '\)' //;
 say $modules;
 for $modules.lines -> $module {
-    run '/rsu/bin/zef', 'install', $module;
+    run '/rsu/share/perl6/site/bin/zef', 'install', $module;
 }
