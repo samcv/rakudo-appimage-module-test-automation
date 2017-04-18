@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+if [ ! "$Prefix" ]; then export Prefix='/rsu'; fi
 if [ "$CI" ]; then set -e; fi
 find_file () { readlink -f  "$(find . -maxdepth 1 -type f -name "$1" | head -n 1)"; }
 find_dir () { readlink -f  "$(find . -maxdepth 1 -type d -name "$1" | head -n 1)"; }
@@ -8,10 +9,10 @@ ORIG_DIR="$(pwd)"
 if [ ! "$P6SCRIPT" ]; then P6SCRIPT=stable; fi
 echo "ORIG_DIR=$ORIG_DIR APP=$APP ID=$ID P6SCRIPT=$P6SCRIPT"
 #stage_1 () {
-if [ -e '/rsu' ]; then sudo rm -rfv /rsu; fi
-sudo mkdir -v /rsu
-sudo chown -R "$(whoami):$(whoami)" /rsu
-sudo chmod 755 /rsu
+if [ -e "$Prefix" ]; then sudo rm -rfv "$Prefix"; fi
+sudo mkdir -v "$Prefix"
+sudo chown -R "$(whoami):$(whoami)" "$Prefix"
+sudo chmod 755 "$Prefix"
 if [ ! "$BLEAD" ]; then
     TAR_GZ=rakudo-star-latest.tar.gz
     check_tar () { gzip -tv $TAR_GZ; }
@@ -26,7 +27,7 @@ if [ ! "$BLEAD" ]; then
     gzip -tv $TAR_GZ
     tar -xf $TAR_GZ || exit
     cd "$(find_dir 'rakudo-star*')" || exit
-    perl ./Configure.pl --prefix="/rsu" --backends=moar --gen-moar || exit
+    perl ./Configure.pl --prefix="$Prefix" --backends=moar --gen-moar || exit
 else
     if [ -d 'rakudo' ]; then
         cd 'rakudo' && git pull
@@ -34,7 +35,7 @@ else
         git clone https://github.com/rakudo/rakudo.git || exit
         cd rakudo || exit
     fi
-    perl Configure.pl --prefix="/rsu" --gen-moar --gen-nqp --backends=moar || exit
+    perl Configure.pl --prefix="$Prefix" --gen-moar --gen-nqp --backends=moar || exit
 fi
 RAKUDO_DIR=$(basename "$(pwd)" )
 export RAKUDO_DIR
@@ -42,23 +43,23 @@ make || exit
 make install || exit
 # Copy the test files a level up for later testing
 #cp -r -v ./t ../rakudo-t
-cd /rsu || exit
+cd "$Prefix" || exit
 # If Linenoise/Readline is installed this is to generate precomp
 # Only copy them over on CI so we don't copy over random junk
 if [[ "$CI" || "$COPY_PRECOMP" ]]; then
   rm -rf ~/.perl6/precomp/
   echo "say 'Welcome to Perl 6!'; exit 0;" | RAKUDO_MODULE_DEBUG=yes LD_LIBRARY_PATH="./lib" ./bin/perl6
   if [ "$ALL_MODULES" ]; then
-    PATH="$PATH:/rsu/bin:/share/perl6/site/bin"
+    PATH="$PATH:$Prefix/bin:/share/perl6/site/bin"
     export PATH
-    /rsu/bin/perl6 "$ORIG_DIR/install_all_modules.p6"
+    "$Prefix/bin/perl6" "$ORIG_DIR/install_all_modules.p6"
   fi
-  cp -r ~/.perl6/precomp/* /rsu/share/perl6/site/precomp || echo "Didn't find any files to copy. Ignoring return values of cp"
+  cp -r ~/.perl6/precomp/* "$Prefix/share/perl6/site/precomp" || echo "Didn't find any files to copy. Ignoring return values of cp"
 fi
 echo "Dumping all found strings that has the original path in it"
-find . -type f -print0 | xargs --null -I '{}' strings '{}' | grep '/rsu'
+find . -type f -print0 | xargs --null -I '{}' strings '{}' | grep "$Prefix"
 echo "Replacing path in binaries"
-find . -type f -print0 | xargs --null -I '{}' sed -i -e 's|/rsu|././|g' '{}'
+find . -type f -print0 | xargs --null -I '{}' sed -i -e "s|$Prefix|././|g" '{}'
 mkdir -p -v usr
 move_all_to () { find . -maxdepth 1 -mindepth 1 ! -name "$1" -exec mv {} "$1" \; ;}
 # AppImage documentation is bad. We must install into some directory (handpaths get coded into one directory), and then we need to then MOVE them to a new folder usr
@@ -96,7 +97,7 @@ cd "$ORIG_DIR" || exit
 
 if [[ $RETURN_CODE == 0 ]]; then
   echo -n
-  if [ "$CI" ]; then sudo rm -rf /rsu; fi
+  if [ "$CI" ]; then sudo rm -rf "$Prefix"; fi
 fi
 echo "Image built as $IMAGE_NAME"
 exit 0

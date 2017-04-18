@@ -1,4 +1,4 @@
-#!/rsu/bin/perl6
+#!/usr/bin/env perl6
 use v6;
 #`(
 The number of builds is the number of sections the module builds are broken
@@ -8,7 +8,7 @@ range from 0-9
 #`)
 say %*ENV<NUM_BUILDS BUILD_NUM>;
 %*ENV<NUM_BUILDS BUILD_NUM> = 10, 10.rand.Int if %*ENV<NUM_BUILDS>:!exists or %*ENV<BUILD_NUM>:!exists;
-my $prefix = '/rsu';
+my $prefix = %*ENV<Prefix> // '/rsu';
 my $build-no = %*ENV<BUILD_NUM>;
 my $no-of-builds = %*ENV<NUM_BUILDS>;
 note "MODULE BUILD NO ", %*ENV<BUILD_NUM>, ' of 0-', %*ENV<NUM_BUILDS>−1, " ($no-of-builds total)";
