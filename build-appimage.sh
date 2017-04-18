@@ -10,9 +10,15 @@ if [ ! "$P6SCRIPT" ]; then P6SCRIPT=stable; fi
 echo "ORIG_DIR=$ORIG_DIR APP=$APP ID=$ID P6SCRIPT=$P6SCRIPT"
 #stage_1 () {
 if [ -e "$Prefix" ]; then sudo rm -rfv "$Prefix"; fi
-sudo mkdir -v "$Prefix"
-sudo chown -R "$(whoami):$(whoami)" "$Prefix"
-sudo chmod 755 "$Prefix"
+if [ "$(echo "$Prefix" | grep -E "^$HOME")" ]; then
+  mkdir -v "$Prefix"
+  chown -R "$(whoami):$(whoami)" "$Prefix"
+  chmod 755 "$Prefix"
+else
+  sudo mkdir -v "$Prefix"
+  sudo chown -R "$(whoami):$(whoami)" "$Prefix"
+  sudo chmod 755 "$Prefix"
+fi
 chars=$(printf "%s" "$(readlink -f /rsu)" | wc -m )
 if [ $(( $chars % 2 )) != 0 ]; then
   echo "Oh no, prefix is the wrong number of characters! needs to be a multiple of 2"
@@ -105,7 +111,9 @@ cd "$ORIG_DIR" || exit
 
 if [[ $RETURN_CODE == 0 ]]; then
   echo -n
-  if [ "$CI" ]; then sudo rm -rf "$Prefix"; fi
+  if [ "$CI" ]; then
+    sudo rm -rf "$Prefix";
+  fi
 fi
 echo "Image built as $IMAGE_NAME"
 exit 0
