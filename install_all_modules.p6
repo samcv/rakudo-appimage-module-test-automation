@@ -6,10 +6,11 @@ my $p6 = '/rsu/bin/perl6';
 run 'git', 'clone', $zef-repo;
 chdir "zef";
 run $p6, '-Ilib', 'bin/zef', 'install', '.';
-run '/rsu/bin/zef', 'update';
-my $modules = qx{/rsu/bin/zef list};
+my $zef = '/rsu/share/perl6/site/bin/zef';
+run $zef, 'update';
+my $modules = qqx{$zef list};
 $modules ~~ s:g/ ':' [ auth | ver ] '(' .*? '\)' //;
 say $modules;
 for $modules.lines -> $module {
-    run '/rsu/share/perl6/site/bin/zef', 'install', $module;
+    run $zef, 'install', $module;
 }
