@@ -9,12 +9,20 @@ ORIG_DIR="$(pwd)"
 if [ ! "$P6SCRIPT" ]; then P6SCRIPT=stable; fi
 echo "ORIG_DIR=$ORIG_DIR APP=$APP ID=$ID P6SCRIPT=$P6SCRIPT"
 #stage_1 () {
-if [ -e "$Prefix" ]; then sudo rm -rfv "$Prefix"; fi
 if [ "$(echo "$Prefix" | grep -E "^$HOME")" ]; then
+  NO_SUDO=1
+fi
+if [ "$NO_SUDO" ]; then
+  if [ -e "$Prefix" ]; then
+    rm -rfv "$Prefix";
+  fi
   mkdir -v "$Prefix"
   chown -R "$(whoami):$(whoami)" "$Prefix"
   chmod 755 "$Prefix"
 else
+  if [ -e "$Prefix" ]; then
+    sudo rm -rfv "$Prefix";
+  fi
   sudo mkdir -v "$Prefix"
   sudo chown -R "$(whoami):$(whoami)" "$Prefix"
   sudo chmod 755 "$Prefix"
