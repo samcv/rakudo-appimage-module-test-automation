@@ -2,3 +2,4 @@ rakudo*/
 *.AppDir
 rakudo-star*.tar.gz
 *.AppImage
+travis_job*.txt

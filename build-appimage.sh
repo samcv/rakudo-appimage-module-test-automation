@@ -13,6 +13,14 @@ if [ -e "$Prefix" ]; then sudo rm -rfv "$Prefix"; fi
 sudo mkdir -v "$Prefix"
 sudo chown -R "$(whoami):$(whoami)" "$Prefix"
 sudo chmod 755 "$Prefix"
+chars=$(printf "%s" "$(readlink -f /rsu)" | wc -m )
+if [ $(( $chars % 2 )) != 0 ]; then
+  echo "Oh no, prefix is the wrong number of characters! needs to be a multiple of 2"
+  exit 1;
+fi
+amount=$(($chars / 2))
+replacement=$(perl -e "print './' x $amount")
+
 if [ ! "$BLEAD" ]; then
     TAR_GZ=rakudo-star-latest.tar.gz
     check_tar () { gzip -tv $TAR_GZ; }
@@ -58,8 +66,8 @@ if [[ "$CI" || "$COPY_PRECOMP" ]]; then
 fi
 echo "Dumping all found strings that has the original path in it"
 find . -type f -print0 | xargs --null -I '{}' strings '{}' | grep "$Prefix"
-echo "Replacing path in binaries"
-find . -type f -print0 | xargs --null -I '{}' sed -i -e "s|$Prefix|././|g" '{}'
+echo "Replacing path in binaries, replacing '$Prefix' with '$replacement'"
+find . -type f -print0 | xargs --null -I '{}' sed -i -e "s|$Prefix|$replacement|g" '{}'
 mkdir -p -v usr
 move_all_to () { find . -maxdepth 1 -mindepth 1 ! -name "$1" -exec mv {} "$1" \; ;}
 # AppImage documentation is bad. We must install into some directory (handpaths get coded into one directory), and then we need to then MOVE them to a new folder usr
