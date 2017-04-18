@@ -54,9 +54,9 @@ if [[ "$CI" || "$COPY_PRECOMP" ]]; then
   cp -r ~/.perl6/precomp/* /rsu/share/perl6/site/precomp || echo "Didn't find any files to copy. Ignoring return values of cp"
 fi
 echo "Dumping all found strings that has the original path in it"
-find . -print0 -type f  | xargs --null -I '{}' strings '{}' | grep '/rsu'
+find . -type f -print0 | xargs --null -I '{}' strings '{}' | grep '/rsu'
 echo "Replacing path in binaries"
-find . -print0 -type f | xargs --null -I '{}' sed -i -e 's|/rsu|././|g' '{}'
+find . -type f -print0 | xargs --null -I '{}' sed -i -e 's|/rsu|././|g' '{}'
 mkdir -p -v usr
 move_all_to () { find . -maxdepth 1 -mindepth 1 ! -name "$1" -exec mv {} "$1" \; ;}
 # AppImage documentation is bad. We must install into some directory (handpaths get coded into one directory), and then we need to then MOVE them to a new folder usr
