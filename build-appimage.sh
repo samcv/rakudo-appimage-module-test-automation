@@ -49,6 +49,8 @@ if [[ "$CI" || "$COPY_PRECOMP" ]]; then
   rm -rf ~/.perl6/precomp/
   echo "say 'Welcome to Perl 6!'; exit 0;" | RAKUDO_MODULE_DEBUG=yes LD_LIBRARY_PATH="./lib" ./bin/perl6
   if [ "$ALL_MODULES" ]; then
+    PATH="$PATH:/rsu/bin:/share/perl6/site/bin"
+    export PATH
     /rsu/bin/perl6 "$ORIG_DIR/install_all_modules.p6"
   fi
   cp -r ~/.perl6/precomp/* /rsu/share/perl6/site/precomp || echo "Didn't find any files to copy. Ignoring return values of cp"
