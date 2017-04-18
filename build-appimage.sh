@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 if [ ! "$Prefix" ]; then export Prefix='/rsu'; fi
+NPROC_NO=$(( $(nproc) + 1 ))
+alias make="$(make -j $NPROC_NO)"
 if [ "$CI" ]; then set -e; fi
 find_file () { readlink -f  "$(find . -maxdepth 1 -type f -name "$1" | head -n 1)"; }
 find_dir () { readlink -f  "$(find . -maxdepth 1 -type d -name "$1" | head -n 1)"; }
