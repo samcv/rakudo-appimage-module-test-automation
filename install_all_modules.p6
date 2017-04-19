@@ -6,6 +6,20 @@ up in.
 For example if there's 10 build nums (10 builds), then the build numbers will
 range from 0-9
 #`)
+sub message ($module, :$timeout, :$exitcode, :$installing) {
+  if $installing {
+    say "\n»» $module »» Trying to install";
+  }
+  if $timeout {
+    say "\n»» $module »» ⚠️ TIMED OUT »» (FAIL, TIMED OUT after $timeout seconds)";
+  }
+  elsif $exitcode == 0 {
+    say "\n»» $module »» 🆗 $exitcode »» (PASS, exit code is $exitcode)";
+  }
+  else {
+    say "\n»» $module »» ⚠️ $exitcode »» (FAIL, exit code is $exitcode)";
+  }
+}
 say %*ENV<NUM_BUILDS BUILD_NUM>;
 %*ENV<NUM_BUILDS BUILD_NUM> = 10, 10.rand.Int if %*ENV<NUM_BUILDS>:!exists or %*ENV<BUILD_NUM>:!exists;
 my $prefix = %*ENV<Prefix> // '/rsu';
@@ -29,19 +43,29 @@ sub MAIN (Str:D $zef-repo = 'https://github.com/ugexe/zef.git',
     run $zef, 'update';
   }
   my $modules = qqx{$zef list};
-  #$modules ~~ s:g/ ':' [ auth | ver ] '(' .*? '\)' //;
   my @module-array = $modules.lines.sort.unique;
   my $module-elems = @module-array.elems;
   my @a := @module-array;
   my @new =  (@a.rotor: @a/(%*ENV<NUM_BUILDS>-1), :partial)[%*ENV<BUILD_NUM>];
   say "Installing: ", @new.join(', ');
+  my $timeout = 10 * 60;
   for $modules.lines -> $module {
-      my $cmd = run $zef, 'install', $module;
-      if $cmd.exitcode == 0 {
-          say "»» $module »» 🆗 {$cmd.exitcode} »» (PASS, exit code is 0)";
-      }
-      else {
-          say "»» $module »» ⚠️ {$cmd.exitcode} »» (FAIL, exit code is {$cmd.exitcode})"
-      }
+    my @cmd = $zef, 'install', $module;
+    my $proc = Proc::Async.new(|@cmd);
+    my $promise = $proc.start;
+    message $module, :installing;
+    my $waitfor = $promise;
+    $waitfor = Promise.anyof(Promise.in($timeout), $promise)
+      if $timeout;
+    await $waitfor;
+    if $promise.status ~~ Kept {
+      message $module, :exitcode($promise.result.exitcode);
+    }
+    else {
+      message $module, :timeout($timeout);
+      $proc.kill;
+      sleep 1 if $promise.status ~~ Planned;
+      $proc.kill: 9;
+    }
   }
 }
