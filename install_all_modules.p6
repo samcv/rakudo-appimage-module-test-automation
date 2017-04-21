@@ -10,7 +10,7 @@ sub message ($module, :$timeout, :$exitcode, :$installing) {
   if $installing {
     say "\n»» $module »» Trying to install";
   }
-  if $timeout {
+  elsif $timeout {
     say "\n»» $module »» ⚠️ TIMED OUT »» (FAIL, TIMED OUT after $timeout seconds)";
   }
   elsif $exitcode == 0 {
