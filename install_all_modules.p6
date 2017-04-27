@@ -43,7 +43,7 @@ sub MAIN (Str:D $zef-repo = 'https://github.com/ugexe/zef.git',
     run $zef, 'update';
   }
   my $modules = qqx{$zef list};
-  my @module-array = $modules.lines.sort.unique;
+  my @module-array = $modules.lines.sort.unique.pick(*);
   my $module-elems = @module-array.elems;
   my @a := @module-array;
   my @new =  (@a.rotor: @a/(%*ENV<NUM_BUILDS>-1), :partial)[%*ENV<BUILD_NUM>];
