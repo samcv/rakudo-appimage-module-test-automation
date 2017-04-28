@@ -43,8 +43,14 @@ sub MAIN (Str :$folder = ".",
   if !$no-install {
     chdir $prefix;
     my $p6 = "$prefix/bin/perl6";
-    run 'git', 'clone', $zef-repo;
-    chdir "zef";
+    if "zef".IO.d {
+      chdir 'zef';
+      run 'git', 'pull';
+    }
+    else {
+      run 'git', 'clone', $zef-repo;
+      chdir "zef";
+    }
     run $p6, '-Ilib', 'bin/zef', 'install', '.';
     if $zef.IO.f.not {
         note "Cannot find $zef file";
@@ -64,8 +70,8 @@ sub MAIN (Str :$folder = ".",
     my @cmd = $zef, 'install', $module;
     my $proc = Proc::Async.new(|@cmd, :out, :err);
     my @output;
-    $proc.out.tap({ .print; @output.push($_) });
-    $proc.err.tap({ $*ERR.print($_); @output.push($_) });
+    $proc.stdout.tap({ .print; @output.push($_) });
+    $proc.stderr.tap({ $*ERR.print($_); @output.push($_) });
     my $promise = $proc.start;
     message $module, :installing;
     %results{$module}<status> = 'Installing';
