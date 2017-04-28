@@ -6,6 +6,8 @@ up in.
 For example if there's 10 build nums (10 builds), then the build numbers will
 range from 0-9
 #`)
+my %results;
+my $date = DateTime.now(formatter => &datetime-formatter, timezone => 0);
 sub message ($module, :$timeout, :$exitcode, :$installing) {
   if $installing {
     say "\n»» $module »» Trying to install";
@@ -20,15 +22,24 @@ sub message ($module, :$timeout, :$exitcode, :$installing) {
     say "\n»» $module »» ⚠️ $exitcode »» (FAIL, exit code is $exitcode)";
   }
 }
+sub datetime-formatter {
+   sprintf "%04d-%02d-%02d_%02d.%02d", .year, .month, .day, .hour, .minute given $^a
+}
+
 say %*ENV<NUM_BUILDS BUILD_NUM>;
 %*ENV<NUM_BUILDS BUILD_NUM> = 10, 10.rand.Int if %*ENV<NUM_BUILDS>:!exists or %*ENV<BUILD_NUM>:!exists;
 my $prefix = %*ENV<Prefix> // '/rsu';
 my $build-no = %*ENV<BUILD_NUM>;
 my $no-of-builds = %*ENV<NUM_BUILDS>;
 note "MODULE BUILD NO ", %*ENV<BUILD_NUM>, ' of 0-', %*ENV<NUM_BUILDS>−1, " ($no-of-builds total)";
-sub MAIN (Str:D $zef-repo = 'https://github.com/ugexe/zef.git',
-  Str:D :$zef = "$prefix/share/perl6/site/bin/zef",
-  Bool:D :$no-install = False) {
+sub MAIN (Str :$folder = ".",
+          Str:D :$zef-repo = 'https://github.com/ugexe/zef.git',
+          Str:D :$zef = "$prefix/share/perl6/site/bin/zef",
+          Bool:D :$no-install = False) {
+
+  my $out-folder = $folder.IO.absolute;
+  my $date-folder = "$out-folder/$date";
+  mkdir $date-folder unless $date-folder.IO.d;
   if !$no-install {
     chdir $prefix;
     my $p6 = "$prefix/bin/perl6";
@@ -51,21 +62,38 @@ sub MAIN (Str:D $zef-repo = 'https://github.com/ugexe/zef.git',
   my $timeout = 10 * 60;
   for $modules.lines -> $module {
     my @cmd = $zef, 'install', $module;
-    my $proc = Proc::Async.new(|@cmd);
+    my $proc = Proc::Async.new(|@cmd, :out, :err);
+    my @output;
+    $proc.out.tap({ .print; @output.push($_) });
+    $proc.err.tap({ $*ERR.print($_); @output.push($_) });
     my $promise = $proc.start;
     message $module, :installing;
+    %results{$module}<status> = 'Installing';
     my $waitfor = $promise;
     $waitfor = Promise.anyof(Promise.in($timeout), $promise)
       if $timeout;
     await $waitfor;
     if $promise.status ~~ Kept {
-      message $module, :exitcode($promise.result.exitcode);
+      my $exitcode = $promise.result.exitcode;
+      message $module, :exitcode($exitcode);
+      %results{$module}<exitcode> = $exitcode;
+      %results{$module}<flag> = $exitcode == 0 ?? 'ok' !! 'nok';
+      %results{$module}<status> = 'done';
     }
     else {
+      %results{$module}<flag> = '?';
+      %results{$module}<status> = 'Timeout ' ~ $timeout ~ 's';
       message $module, :timeout($timeout);
       $proc.kill;
       sleep 1 if $promise.status ~~ Planned;
       $proc.kill: 9;
     }
+    %results{$module}<date> = DateTime.now(formatter => &datetime-formatter, timezone => 0);
+    write-out($out-folder, %results, $module, @output.join, $date-folder);
   }
+}
+sub write-out ($out-folder, %results, $module, $output, $date-folder) {
+  try require JSON::Fast <&to-json>;
+  "$out-folder/$date.json".IO.spurt(to-json(%results));
+  "$date-folder/$module.log".IO.spurt($output);
 }
