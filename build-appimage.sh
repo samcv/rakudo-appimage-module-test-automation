@@ -76,7 +76,7 @@ if [[ "$CI" || "$COPY_PRECOMP" ]]; then
   if [ "$ALL_MODULES" ]; then
     PATH="$PATH:$Prefix/bin:/share/perl6/site/bin"
     export PATH
-    "$Prefix/bin/perl6" "$ORIG_DIR/install_all_modules.p6"
+    "$Prefix/bin/perl6" "$ORIG_DIR/install_all_modules.p6" "--folder=$LOG_FOLDER"
   fi
   cp -r ~/.perl6/precomp/* "$Prefix/share/perl6/site/precomp" || echo "Didn't find any files to copy. Ignoring return values of cp"
 fi
