@@ -28,9 +28,9 @@ sub datetime-formatter {
 
 say %*ENV<NUM_BUILDS BUILD_NUM>;
 %*ENV<NUM_BUILDS BUILD_NUM> = 10, 10.rand.Int if %*ENV<NUM_BUILDS>:!exists or %*ENV<BUILD_NUM>:!exists;
-my $prefix = %*ENV<Prefix> // '/rsu';
-my $build-no = %*ENV<BUILD_NUM>;
-my $no-of-builds = %*ENV<NUM_BUILDS>;
+my Str:D $prefix = %*ENV<Prefix> // '/rsu';
+my Int:D $build-no = %*ENV<BUILD_NUM> // 0;
+my Int:D $no-of-builds = %*ENV<NUM_BUILDS> // 1;
 note "MODULE BUILD NO ", %*ENV<BUILD_NUM>, ' of 0-', %*ENV<NUM_BUILDS>−1, " ($no-of-builds total)";
 sub MAIN (Str :$folder = ".",
           Str:D :$zef-repo = 'https://github.com/ugexe/zef.git',
@@ -61,12 +61,23 @@ sub MAIN (Str :$folder = ".",
   }
   my $modules = qqx{$zef list};
   my @module-array = $modules.lines.sort.unique.pick(*);
-  my $module-elems = @module-array.elems;
-  my @a := @module-array;
-  my @new =  (@a.rotor: @a/(%*ENV<NUM_BUILDS>-1), :partial)[%*ENV<BUILD_NUM>];
-  say "Installing: ", @new.join(', ');
+  my @new-mod-array;
+  my $fast;
+  for @module-array -> $mod {
+    next unless $mod and $mod !~~ /^\s*$/;
+    if $mod ~~ /^'JSON::Fast' ['('.*]? $/ {
+      $fast = $mod;
+    }
+    else {
+      @new-mod-array.push: $mod;
+    }
+  }
+  @new-mod-array.unshift($fast) if $fast;
+  @module-array = @new-mod-array;
+  #my @new =  (@a.rotor: @a/(%*ENV<NUM_BUILDS>-1), :partial)[%*ENV<BUILD_NUM>];
+  say "Installing ", @module-array.elems, ': ', @module-array.join(', ');
   my $timeout = 10 * 60;
-  for $modules.lines -> $module {
+  for @module-array -> $module {
     my @cmd = $zef, 'install', $module;
     my $proc = Proc::Async.new(|@cmd, :out, :err);
     my @output;
@@ -94,12 +105,16 @@ sub MAIN (Str :$folder = ".",
       sleep 1 if $promise.status ~~ Planned;
       $proc.kill: 9;
     }
-    %results{$module}<date> = DateTime.now(formatter => &datetime-formatter, timezone => 0);
+    %results{$module}<date> = DateTime.now(formatter => &datetime-formatter, timezone => 0).Str;
     write-out($out-folder, %results, $module, @output.join, $date-folder);
   }
 }
+sub my-to-json (|d) {
+    my $json = try require JSON::Fast <&to-json>;
+    $json = sub (|c) { Rakudo::Internals::JSON.to-json(|c) };
+    &to-json.defined ?? to-json(|d) !! $json(|d);
+}
 sub write-out ($out-folder, %results, $module, $output, $date-folder) {
-  try require JSON::Fast <&to-json>;
-  "$out-folder/$date.json".IO.spurt(to-json(%results));
+  "$out-folder/$date.json".IO.spurt(my-to-json(%results));
   "$date-folder/$module.log".IO.spurt($output);
 }
