@@ -78,7 +78,9 @@ sub MAIN (Str :$folder = ".",
   say "Installing ", @module-array.elems, ': ', @module-array.join(', ');
   my $timeout = 10 * 60;
   for @module-array -> $module {
-    my @cmd = $zef, 'install', $module;
+    %results{$module}<status> = 'pending';
+    "$out-folder/$date.json".IO.spurt(my-to-json(%results));
+    my @cmd = $zef, '--debug', 'install', $module;
     my $proc = Proc::Async.new(|@cmd, :out, :err);
     my @output;
     $proc.stdout.tap({ .print; @output.push($_) });
@@ -104,6 +106,8 @@ sub MAIN (Str :$folder = ".",
       $proc.kill;
       sleep 1 if $promise.status ~~ Planned;
       $proc.kill: 9;
+      qx{killall git};
+      qx{killall zef};
     }
     %results{$module}<date> = DateTime.now(formatter => &datetime-formatter, timezone => 0).Str;
     write-out($out-folder, %results, $module, @output.join, $date-folder);
