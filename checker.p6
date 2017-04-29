@@ -11,7 +11,7 @@ my $pairs;
 my $repo-url;
 my %nuhash; # name-url hash
 
-sub MAIN(Str :$repo) {
+sub MAIN(Str :$repo, Bool:D :$debug = False) {
     die "Repository name must be passed" if !$repo.defined;
 
     # Populate our URL cache
@@ -28,7 +28,7 @@ sub MAIN(Str :$repo) {
         %nuhash.push: $entry[0] => $entry[1];
     }
 
-    die "Repository name is incorrect"; if !%nuhash{$repo}.defined;
+    die "Repository name is incorrect" ~ %nuhash.perl if !%nuhash{$repo}.defined;
 
     # Find appropriate url and truncate it
     my $repo-url-base = %nuhash{$repo}.split('/')[3..*].join('/');
@@ -37,14 +37,26 @@ sub MAIN(Str :$repo) {
 
     # json getting and checking
     my $json = from-json(qqx{curl '$repo-url'});
-    if ($json>>.<title>.grep(/'[Eco] Tests are failing'/).elems != 0) {
+    my token eco-fail { '[Eco] Tests are failing'};
+    if ($json>>.<title>.grep(/<eco-fail>/).elems != 0) {
         say 'It is clear';
         exit 0; # the issue is already opened
     } else {
         say 'We need to post something quickly!';
+        ( .note for $json>>.<title>.list ) if $debug;
+
         exit 1; # we need to create an issue
         # Some credential related work here
         # Given the repo-url-base, we can construct an API calls
         # to create issues here
     };
+}
+sub github-api-fetch (Str:D $url) {
+    state $token = do {
+        from-json('config.json')<token> if 'config.json'.IO.f;
+    }
+    my @args = 'curl', '-s';
+    @args.append: '-H', "Authorization: token $token" if $token;
+    my $cmd = run |@args, $url, :out;
+    $cmd.out.slurp;
 }
