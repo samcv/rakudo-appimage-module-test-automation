@@ -21,7 +21,7 @@ sub MAIN(Str :$repo, Bool:D :$debug = False) {
             unlink $pairs-filename;
         }
     } else {
-        $pairs = from-json(qqx{curl -s '$modules-url'})<dists>>>.<name url>;
+        $pairs = from-json(fetch $modules-url)<dists>>>.<name url>;
         spurt($pairs-filename, to-json($pairs));
     }
     for @$pairs -> $entry {
@@ -36,7 +36,7 @@ sub MAIN(Str :$repo, Bool:D :$debug = False) {
     $repo-url = $api-url ~ $repo-url-base ~ '/issues';
 
     # json getting and checking
-    my $json = from-json(qqx{curl '$repo-url'});
+    my $json = from-json(github-api-fetch $repo-url);
     my token eco-fail { '[Eco] Tests are failing'};
     if ($json>>.<title>.grep(/<eco-fail>/).elems != 0) {
         say 'It is clear';
@@ -51,12 +51,23 @@ sub MAIN(Str :$repo, Bool:D :$debug = False) {
         # to create issues here
     };
 }
-sub github-api-fetch (Str:D $url) {
+sub curl (*@args) {
+    my $*cmd = run |@args, $*url, :out;
+    url-fetch-msg;
+    $*cmd.out.slurp;
+}
+sub fetch (Str:D $*url) {
+    my @args = 'curl', '-s';
+    curl @args;
+}
+sub github-api-fetch (Str:D $*url) {
     state $token = do {
-        from-json('config.json')<token> if 'config.json'.IO.f;
+        from-json('config.json'.IO.slurp)<token> if 'config.json'.IO.f;
     }
     my @args = 'curl', '-s';
     @args.append: '-H', "Authorization: token $token" if $token;
-    my $cmd = run |@args, $url, :out;
-    $cmd.out.slurp;
+    curl @args;
+}
+sub url-fetch-msg {
+    note "Warning, got non-zero exitcode when fetching $*url\n" if $*cmd.exitcode != 0;
 }
