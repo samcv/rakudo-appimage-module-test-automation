@@ -25,7 +25,10 @@ sub message ($module, :$timeout, :$exitcode, :$installing) {
 sub datetime-formatter {
    sprintf "%04d-%02d-%02d_%02d.%02d", .year, .month, .day, .hour, .minute given $^a
 }
-
+sub get-other-moar-pid's {
+    my $term = "'^$*PID\$'";
+    qqx{pgrep moar | grep -vE $term }.lines;
+}
 say %*ENV<NUM_BUILDS BUILD_NUM>;
 %*ENV<NUM_BUILDS BUILD_NUM> = 10, 10.rand.Int if %*ENV<NUM_BUILDS>:!exists or %*ENV<BUILD_NUM>:!exists;
 my Str:D $prefix = %*ENV<Prefix> // '/rsu';
@@ -106,8 +109,17 @@ sub MAIN (Str :$folder = ".",
       $proc.kill;
       sleep 1 if $promise.status ~~ Planned;
       $proc.kill: 9;
+      my @pids = get-other-moar-pid's;
+      for @pids {
+          qqx{kill $_};
+      }
       qx{killall git};
       qx{killall zef};
+      sleep 1;
+      for @pids {
+          qqx{kill -9 $_};
+      }
+
     }
     %results{$module}<date> = DateTime.now(formatter => &datetime-formatter, timezone => 0).Str;
     write-out($out-folder, %results, $module, @output.join, $date-folder);
