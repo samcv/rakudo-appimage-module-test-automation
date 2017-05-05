@@ -1,11 +1,14 @@
 #!/usr/bin/env perl6
 use v6;
+use lib 'lib';
+use pid;
 #`(
 The number of builds is the number of sections the module builds are broken
 up in.
 For example if there's 10 build nums (10 builds), then the build numbers will
 range from 0-9
 #`)
+my $USER = %*ENV<USER>;
 my %results;
 my $date = DateTime.now(formatter => &datetime-formatter, timezone => 0);
 sub message ($module, :$timeout, :$exitcode, :$installing) {
@@ -24,10 +27,6 @@ sub message ($module, :$timeout, :$exitcode, :$installing) {
 }
 sub datetime-formatter {
    sprintf "%04d-%02d-%02d_%02d.%02d", .year, .month, .day, .hour, .minute given $^a
-}
-sub get-other-moar-pid's {
-    my $term = "'^$*PID\$'";
-    qqx{pgrep moar | grep -vE $term }.lines;
 }
 say %*ENV<NUM_BUILDS BUILD_NUM>;
 %*ENV<NUM_BUILDS BUILD_NUM> = 10, 10.rand.Int if %*ENV<NUM_BUILDS>:!exists or %*ENV<BUILD_NUM>:!exists;
@@ -111,14 +110,17 @@ sub MAIN (Str :$folder = ".",
       $proc.kill: 9;
       my @pids = get-other-moar-pid's;
       for @pids {
-          qqx{kill $_};
+          kill .Int;
       }
-      qx{killall git};
-      qx{killall zef};
+      kill 'git';
+      kill 'zef';
       sleep 1;
+      @pids = get-other-moar-pid's;
       for @pids {
-          qqx{kill -9 $_};
+          kill $_, :signal(9);
       }
+      kill 'git', :signal(9);
+      kill 'zef', :signal(9);
 
     }
     %results{$module}<date> = DateTime.now(formatter => &datetime-formatter, timezone => 0).Str;
