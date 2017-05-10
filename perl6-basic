@@ -1,4 +1,4 @@
 #!/bin/sh
-exec ./bin/moar  --execname="$0" --libpath="././share/nqp/lib" \
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:./lib:./usr/lib" exec ./bin/moar  --execname="$0" --libpath="././share/nqp/lib" \
 --libpath="././share/nqp/lib" --libpath="././share/perl6/lib" \
 --libpath="././share/perl6/runtime" ././share/perl6/runtime/perl6.moarvm "$@"
