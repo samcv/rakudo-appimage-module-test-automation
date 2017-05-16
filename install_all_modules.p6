@@ -1,7 +1,14 @@
 #!/usr/bin/env perl6
 use v6;
-use lib 'lib';
-use pid;
+
+my IO::Path ($dir, $libdir);
+BEGIN {
+    $dir = %*ENV<OWD> ?? %*ENV<OWD>.IO !! $*CWD;
+    $libdir = ($dir ~ '/lib').IO;
+}
+chdir $dir;
+use lib $libdir.Str;
+require pid <&kill &get-other-moar-pid's>;
 #`(
 The number of builds is the number of sections the module builds are broken
 up in.
@@ -25,12 +32,17 @@ sub message ($module, :$timeout, :$exitcode, :$installing) {
     say "\n»» $module »» ⚠️ $exitcode »» (FAIL, exit code is $exitcode)";
   }
 }
+sub get-p6-prefix {
+    my $dir = qx{command -v perl6 2> /dev/null}.trim;
+    return $dir ?? $dir.IO.parent.parent !! (%*ENV<Prefix> // '/rsu').IO;
+}
 sub datetime-formatter {
    sprintf "%04d-%02d-%02d_%02d.%02d", .year, .month, .day, .hour, .minute given $^a
 }
 say %*ENV<NUM_BUILDS BUILD_NUM>;
 %*ENV<NUM_BUILDS BUILD_NUM> = 10, 10.rand.Int if %*ENV<NUM_BUILDS>:!exists or %*ENV<BUILD_NUM>:!exists;
-my Str:D $prefix = %*ENV<Prefix> // '/rsu';
+my IO::Path $prefix = get-p6-prefix;
+say "PREFIX $prefix";
 my Int:D $build-no = %*ENV<BUILD_NUM> // 0;
 my Int:D $no-of-builds = %*ENV<NUM_BUILDS> // 1;
 note "MODULE BUILD NO ", %*ENV<BUILD_NUM>, ' of 0-', %*ENV<NUM_BUILDS>−1, " ($no-of-builds total)";

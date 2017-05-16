@@ -1,4 +1,5 @@
 rakudo*/
+**/**/.precomp/
 *.AppDir
 rakudo-star*.tar.gz
 *.AppImage
