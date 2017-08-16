@@ -72,7 +72,7 @@ cd "$Prefix" || exit
 # Only copy them over on CI so we don't copy over random junk
 if [[ "$CI" || "$COPY_PRECOMP" ]]; then
   rm -rf ~/.perl6/precomp/
-  echo "say 'Welcome to Perl 6!'; exit 0;" | RAKUDO_MODULE_DEBUG=yes LD_LIBRARY_PATH="./lib" ./bin/perl6
+  echo "say 'Welcome to Perl 6!'; exit 0;" | RAKUDO_MODULE_DEBUG=1 LD_LIBRARY_PATH="./lib" ./bin/perl6
   if [ "$ALL_MODULES" ]; then
     PATH="$PATH:$Prefix/bin:/share/perl6/site/bin"
     export PATH
